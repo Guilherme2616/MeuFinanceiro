@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerenciar Formas de Pagamento</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+<body class="bg-light p-5">
+    <div class="container" style="max-width: 600px;">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary mb-4">Voltar ao Dashboard</a>
+        <div class="card shadow p-4">
+            <h4>Formas de Pagamento</h4>
+            <form method="POST" class="d-flex gap-2 my-3">
+                <input type="text" name="nome" class="form-control" placeholder="Nova forma (ex: Vale Refeição)" required>
+                <button type="submit" class="btn btn-success">Adicionar</button>
+            </form>
+            <ul class="list-group">
+                {% for f in formas %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ f.nome }}
+                    <a href="{{ url_for('excluir_forma', id=f.id) }}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
