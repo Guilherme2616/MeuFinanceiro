@@ -9,7 +9,7 @@ class Usuario(db.Model, UserMixin):
     nome_completo = db.Column(db.String(100), nullable=False)
     telefone = db.Column(db.String(20), nullable=False)
     cpf = db.Column(db.String(14), unique=True, nullable=False)
-    senha = db.Column(db.String(255), nullable=False) # Aumentamos o tamanho para caber o Hash
+    senha = db.Column(db.String(255), nullable=False)
     
     movimentacoes = db.relationship('Movimentacao', backref='dono', lazy=True)
     formas_pagamento = db.relationship('FormaPagamento', backref='dono_forma', lazy=True)
@@ -29,6 +29,7 @@ class Categoria(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(50), nullable=False)
     icone = db.Column(db.String(50), nullable=False)
+    cor = db.Column(db.String(20), nullable=False, default='#5F7254')
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     subcategorias = db.relationship('Subcategoria', backref='categoria_pai', lazy=True)
 
@@ -44,6 +45,7 @@ class FormaPagamento(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(50), nullable=False)
     icone = db.Column(db.String(50), nullable=False)
+    cor = db.Column(db.String(20), nullable=False, default='#6c757d') # NOVA COLUNA DE COR
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
 
 class Movimentacao(db.Model):

@@ -27,27 +27,17 @@
         <nav class="col-md-2 d-none d-md-block sidebar shadow-lg">
             <h3 class="text-center mb-5 mt-3 fw-bold"><i class="bi bi-leaf me-2"></i>Meu Financeiro</h3>
             <ul class="nav flex-column gap-2">
-                <li class="nav-item">
-                    <a class="nav-link active" href="{{ url_for('dashboard') }}"><i class="bi bi-pie-chart-fill me-2"></i> Dashboard</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('lancamentos') }}"><i class="bi bi-card-list me-2"></i> Lançamentos</a>
-                </li>
+                <li class="nav-item"><a class="nav-link active" href="{{ url_for('dashboard') }}"><i class="bi bi-pie-chart-fill me-2"></i> Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('lancamentos') }}"><i class="bi bi-card-list me-2"></i> Lançamentos</a></li>
                 <li class="nav-item mt-2 border-top pt-2 border-secondary">
                     <a class="nav-link" data-bs-toggle="collapse" href="#cadastrosMenu" role="button" aria-expanded="false">
                         <i class="bi bi-folder-fill me-2"></i> Cadastros <i class="bi bi-chevron-down float-end mt-1" style="font-size: 0.8rem;"></i>
                     </a>
                     <div class="collapse" id="cadastrosMenu">
                         <ul class="nav flex-column ms-3 mt-1 gap-1">
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('gerenciar_categorias') }}" style="font-size: 0.9rem;"><i class="bi bi-tags-fill me-2"></i> Categorias</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('orcamentos') }}" style="font-size: 0.9rem;"><i class="bi bi-bullseye me-2"></i> Orçamentos</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('gerenciar_formas') }}" style="font-size: 0.9rem;"><i class="bi bi-credit-card-fill me-2"></i> Pagamentos</a>
-                            </li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('gerenciar_categorias') }}" style="font-size: 0.9rem;"><i class="bi bi-tags-fill me-2"></i> Categorias</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('orcamentos') }}" style="font-size: 0.9rem;"><i class="bi bi-bullseye me-2"></i> Orçamentos</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('gerenciar_formas') }}" style="font-size: 0.9rem;"><i class="bi bi-credit-card-fill me-2"></i> Pagamentos</a></li>
                         </ul>
                     </div>
                 </li>
@@ -56,10 +46,7 @@
 
         <main class="col-md-10 ms-sm-auto px-md-5 position-relative">
             <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-sm btn-logout fw-bold rounded-pill px-4">Sair</a>
-
-            <div class="pt-4 pb-2 mb-4 border-bottom border-dark-subtle mt-3 d-flex justify-content-between align-items-end">
-                <h2 class="fw-bold m-0">Visão Geral</h2>
-            </div>
+            <div class="pt-4 pb-2 mb-4 border-bottom border-dark-subtle mt-3 d-flex justify-content-between align-items-end"><h2 class="fw-bold m-0">Visão Geral</h2></div>
 
             <div class="card card-custom p-3 mb-4 bg-white">
                 <form method="GET" action="{{ url_for('dashboard') }}" class="row g-3 align-items-end" autocomplete="off">
@@ -71,54 +58,50 @@
                         <label class="form-label small fw-bold text-muted">Data Final</label>
                         <input type="date" name="data_fim" class="form-control" value="{{ data_fim or '' }}">
                     </div>
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-salvar w-100 shadow-sm"><i class="bi bi-funnel-fill me-2"></i>Filtrar</button>
-                    </div>
-                    <div class="col-md-2">
-                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary w-100">Limpar</a>
-                    </div>
+                    <div class="col-md-2"><button type="submit" class="btn btn-salvar w-100 shadow-sm"><i class="bi bi-funnel-fill me-2"></i>Filtrar</button></div>
+                    <div class="col-md-2"><a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary w-100">Limpar</a></div>
                 </form>
             </div>
 
             <div class="row g-3 mb-4">
                 <div class="col-md-3">
                     <div class="card card-custom p-3 bg-white border-start border-success border-5">
-                        <h6 class="text-success fw-bold small">TOTAL ENTRADA (MÊS)</h6>
-                        <h3 class="fw-bold text-dark">R$ {{ t_entrada|formato_moeda }}</h3>
+                        <h6 class="text-success fw-bold small">TOTAL ENTRADA (PERÍODO)</h6>
+                        <h3 class="fw-bold text-dark mb-0">R$ {{ t_entrada|formato_moeda }}</h3>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="card card-custom p-3 bg-white border-start border-danger border-5">
-                        <h6 class="text-danger fw-bold small">TOTAL SAÍDA (MÊS)</h6>
-                        <h3 class="fw-bold text-dark">R$ {{ t_saida|formato_moeda }}</h3>
+                        <h6 class="text-danger fw-bold small">TOTAL SAÍDA (PERÍODO)</h6>
+                        <h3 class="fw-bold text-dark mb-0">R$ {{ t_saida|formato_moeda }}</h3>
+                        <small class="text-muted fw-bold" style="font-size: 0.75rem;">A pagar no futuro: R$ {{ t_saida_futura|formato_moeda }}</small>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="card card-custom p-3 bg-white border-start border-info border-5">
                         <h6 class="text-info fw-bold small">INVESTIMENTO (TOTAL)</h6>
-                        <h3 class="fw-bold text-dark">R$ {{ t_investimento|formato_moeda }}</h3>
+                        <h3 class="fw-bold text-dark mb-0">R$ {{ t_investimento|formato_moeda }}</h3>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="card card-custom p-3 text-white shadow" style="background-color: var(--cor-sidebar);">
                         <h6 class="fw-bold opacity-75 small">SALDO GERAL DA CONTA</h6>
-                        <h3 class="fw-bold">R$ {{ caixa|formato_moeda }}</h3>
+                        <h3 class="fw-bold mb-0">R$ {{ caixa|formato_moeda }}</h3>
                     </div>
                 </div>
             </div>
 
-            <div class="row g-4 mb-5">
+            <div class="row g-4 mb-4">
                 <div class="col-md-4">
                     <div class="card card-custom p-4 bg-white h-100">
-                        <h5 class="fw-bold mb-4 text-center" style="color: var(--cor-sidebar);"><i class="bi bi-bullseye me-2"></i>Metas do Mês</h5>
+                        <h5 class="fw-bold mb-4 text-center" style="color: var(--cor-sidebar);"><i class="bi bi-bullseye me-2"></i>Metas do Período</h5>
                         {% for orc in orcamentos %}
                             {% set gasto = gastos_cat.get(orc.categoria, 0) %}
                             {% set pct = (gasto / orc.valor_limite) * 100 %}
                             {% set cor = 'success' if pct < 75 else ('warning' if pct < 100 else 'danger') %}
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between small fw-bold mb-1">
-                                    <span>{{ orc.categoria }}</span>
-                                    <span>R$ {{ gasto|formato_moeda }} / R$ {{ orc.valor_limite|formato_moeda }}</span>
+                                    <span>{{ orc.categoria }}</span><span>R$ {{ gasto|formato_moeda }} / R$ {{ orc.valor_limite|formato_moeda }}</span>
                                 </div>
                                 <div class="progress border" style="height: 12px;">
                                     <div class="progress-bar bg-{{ cor }}" role="progressbar" style="width: {{ pct }}%;"></div>
@@ -133,20 +116,32 @@
                 <div class="col-md-4">
                     <div class="card card-custom p-4 bg-white h-100">
                         <h5 class="fw-bold mb-4 text-center" style="color: var(--cor-sidebar);">Despesas por Categoria</h5>
-                        <div style="position: relative; height:250px; width:100%">
-                            <canvas id="graficoCategorias"></canvas>
-                        </div>
+                        <div style="position: relative; height:250px; width:100%"><canvas id="graficoCategorias"></canvas></div>
                     </div>
                 </div>
+                
                 <div class="col-md-4">
                     <div class="card card-custom p-4 bg-white h-100">
-                        <h5 class="fw-bold mb-4 text-center" style="color: var(--cor-sidebar);">Balanço do Período</h5>
-                        <div style="position: relative; height:250px; width:100%">
-                            <canvas id="graficoBalanco"></canvas>
-                        </div>
+                        <h5 class="fw-bold mb-4 text-center" style="color: var(--cor-sidebar);">Resumo do Período</h5>
+                        <div style="position: relative; height:250px; width:100%"><canvas id="graficoBalanco"></canvas></div>
                     </div>
                 </div>
             </div>
+
+            <div class="row g-4 mb-5">
+                <div class="col-12">
+                    <div class="card card-custom p-4 bg-white">
+                        <h5 class="fw-bold mb-4 text-center" style="color: var(--cor-sidebar);">
+                            <i class="bi bi-bar-chart-steps me-2"></i>Evolução Mês a Mês
+                        </h5>
+                        <div style="position: relative; height: 350px; width: 100%;">
+                            <canvas id="graficoMensalMixto"></canvas>
+                        </div>
+                        <small class="text-muted text-center d-block mt-2">* Clique nas legendas acima para esconder/mostrar informações.</small>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 </div>
@@ -155,9 +150,11 @@
 
 <script>
     Chart.defaults.font.family = "'Raleway', sans-serif";
-
+    
+    // 1. Gráfico de Categorias (Rosca)
     const labelsCat = {{ labels_cat | tojson | safe }};
     const valoresCat = {{ valores_cat | tojson | safe }};
+    const coresCat = {{ cores_cat | tojson | safe }};
 
     if (labelsCat.length > 0) {
         const ctxCategorias = document.getElementById('graficoCategorias').getContext('2d');
@@ -167,7 +164,7 @@
                 labels: labelsCat,
                 datasets: [{
                     data: valoresCat,
-                    backgroundColor: ['#5F7254', '#783E19', '#E0A96D', '#201E20', '#DDC3A5', '#8E8D8A', '#E85A4F'],
+                    backgroundColor: coresCat,
                     borderWidth: 2, borderColor: '#fff'
                 }]
             },
@@ -175,6 +172,7 @@
         });
     }
 
+    // 2. Gráfico Balanço Simples (Barras)
     const ctxBalanco = document.getElementById('graficoBalanco').getContext('2d');
     new Chart(ctxBalanco, {
         type: 'bar',
@@ -189,7 +187,82 @@
         },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
     });
-</script>
 
+    // 3. NOVO: Gráfico Misto Mês a Mês
+    const ctxMensal = document.getElementById('graficoMensalMixto').getContext('2d');
+    new Chart(ctxMensal, {
+        type: 'bar', // Tipo principal
+        data: {
+            labels: {{ labels_meses | tojson | safe }},
+            datasets: [
+                {
+                    label: 'Entradas',
+                    type: 'bar',
+                    data: {{ dados_entradas_mes | tojson | safe }},
+                    backgroundColor: 'rgba(25, 135, 84, 0.8)', // Verde
+                    borderRadius: 4
+                },
+                {
+                    label: 'Saídas',
+                    type: 'bar',
+                    data: {{ dados_saidas_mes | tojson | safe }},
+                    backgroundColor: 'rgba(220, 53, 69, 0.8)', // Vermelho
+                    borderRadius: 4
+                },
+                {
+                    label: 'Investimentos',
+                    type: 'line',
+                    data: {{ dados_investimentos_mes | tojson | safe }},
+                    borderColor: '#0dcaf0', // Azul claro
+                    backgroundColor: '#0dcaf0',
+                    borderWidth: 3,
+                    tension: 0.3,
+                    fill: false
+                },
+                {
+                    label: 'Teto de Orçamento',
+                    type: 'line',
+                    data: {{ dados_orcamento_mes | tojson | safe }},
+                    borderColor: '#ffc107', // Amarelo
+                    backgroundColor: '#ffc107',
+                    borderDash: [5, 5],
+                    borderWidth: 2,
+                    pointRadius: 4,
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: { usePointStyle: true, padding: 20 }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) { label += ': '; }
+                            if (context.parsed.y !== null) {
+                                label += new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(context.parsed.y);
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
 </body>
 </html>

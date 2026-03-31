@@ -10,8 +10,6 @@
         body { background-color: #FDFDE5; font-family: 'Raleway', sans-serif; color: #333; }
         .btn-salvar { background-color: #783E19; color: white; font-weight: 700; border: none; }
         .btn-salvar:hover { background-color: #5c2e11; color: white; }
-        
-        /* Estilo do Seletor de Ícones (Radio Buttons invisíveis) */
         .icon-selector input[type="radio"] { display: none; }
         .icon-selector label {
             display: inline-block; padding: 10px 15px; margin: 5px; 
@@ -20,8 +18,7 @@
             background-color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         .icon-selector input[type="radio"]:checked + label {
-            border-color: #5F7254; background-color: #e9f0e6; color: #5F7254;
-            transform: scale(1.1);
+            border-color: #5F7254; background-color: #e9f0e6; color: #5F7254; transform: scale(1.1);
         }
         .card-custom { border-radius: 16px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .header-bg { background-color: #5F7254; color: white; border-radius: 16px 16px 0 0; padding: 15px; }
@@ -30,18 +27,24 @@
 <body class="p-4 p-md-5">
 
 <div class="container" style="max-width: 900px;">
-    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-dark rounded-pill fw-bold mb-4"><i class="bi bi-arrow-left me-2"></i>Voltar ao Dashboard</a>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-dark rounded-pill fw-bold mb-4"><i class="bi bi-arrow-left me-2"></i>Voltar</a>
     
     <div class="row g-4">
         <div class="col-md-6">
             <div class="card card-custom h-100 bg-white">
                 <div class="header-bg fw-bold"><i class="bi bi-tag-fill me-2"></i>Nova Categoria</div>
                 <div class="card-body p-4">
-                    <form method="POST">
+                    <form method="POST" autocomplete="off">
                         <input type="hidden" name="tipo_form" value="categoria">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Nome da Categoria</label>
-                            <input type="text" name="nome" class="form-control" placeholder="Ex: Festas, Veículo..." required>
+                        <div class="row mb-3">
+                            <div class="col-9">
+                                <label class="form-label fw-bold">Nome da Categoria</label>
+                                <input type="text" name="nome" class="form-control" placeholder="Ex: Festas..." required>
+                            </div>
+                            <div class="col-3">
+                                <label class="form-label fw-bold">Cor</label>
+                                <input type="color" name="cor" class="form-control form-control-color w-100" value="#5F7254" title="Escolha a cor">
+                            </div>
                         </div>
                         <label class="form-label fw-bold mt-2">Escolha um Ícone</label>
                         <div class="icon-selector mb-4">
@@ -66,19 +69,17 @@
             <div class="card card-custom h-100 bg-white">
                 <div class="header-bg fw-bold" style="background-color: #4a5c41;"><i class="bi bi-diagram-2-fill me-2"></i>Nova Subcategoria</div>
                 <div class="card-body p-4">
-                    <form method="POST">
+                    <form method="POST" autocomplete="off">
                         <input type="hidden" name="tipo_form" value="subcategoria">
                         <div class="mb-3">
                             <label class="form-label fw-bold">Pertence à qual Categoria?</label>
                             <select name="categoria_id" class="form-select" required>
-                                {% for cat in categorias %}
-                                <option value="{{ cat.id }}">{{ cat.nome }}</option>
-                                {% endfor %}
+                                {% for cat in categorias %}<option value="{{ cat.id }}">{{ cat.nome }}</option>{% endfor %}
                             </select>
                         </div>
                         <div class="mb-4">
                             <label class="form-label fw-bold">Nome da Subcategoria</label>
-                            <input type="text" name="nome" class="form-control" placeholder="Ex: Combustível, Decoração..." required>
+                            <input type="text" name="nome" class="form-control" placeholder="Ex: Decoração..." required>
                         </div>
                         <button type="submit" class="btn btn-salvar w-100 py-2 rounded-pill">Salvar Subcategoria</button>
                     </form>
@@ -91,9 +92,9 @@
     <div class="row g-3">
         {% for cat in categorias %}
         <div class="col-md-4">
-            <div class="card card-custom bg-white p-3">
+            <div class="card card-custom bg-white p-3 border-top border-5" style="border-color: {{ cat.cor }} !important;">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h5 class="fw-bold m-0"><i class="bi {{ cat.icone }} me-2" style="color: #5F7254;"></i>{{ cat.nome }}</h5>
+                    <h5 class="fw-bold m-0"><i class="bi {{ cat.icone }} me-2" style="color: {{ cat.cor }};"></i>{{ cat.nome }}</h5>
                     <a href="{{ url_for('excluir_categoria', id=cat.id) }}" class="text-danger" onclick="return confirm('Excluir esta categoria apagará todas as subcategorias dela. Confirmar?')"><i class="bi bi-trash-fill"></i></a>
                 </div>
                 <ul class="list-unstyled ms-4 mt-2 mb-0 small text-muted fw-bold">
