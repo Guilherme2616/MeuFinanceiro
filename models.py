@@ -9,12 +9,20 @@ class Usuario(db.Model, UserMixin):
     nome_completo = db.Column(db.String(100), nullable=False)
     telefone = db.Column(db.String(20), nullable=False)
     cpf = db.Column(db.String(14), unique=True, nullable=False)
-    senha = db.Column(db.String(100), nullable=False)
+    senha = db.Column(db.String(255), nullable=False) # Aumentamos o tamanho para caber o Hash
     
     movimentacoes = db.relationship('Movimentacao', backref='dono', lazy=True)
     formas_pagamento = db.relationship('FormaPagamento', backref='dono_forma', lazy=True)
     categorias = db.relationship('Categoria', backref='dono_categoria', lazy=True)
     subcategorias = db.relationship('Subcategoria', backref='dono_sub', lazy=True)
+    orcamentos = db.relationship('Orcamento', backref='dono_orc', lazy=True)
+
+class Orcamento(db.Model):
+    __tablename__ = 'orcamento'
+    id = db.Column(db.Integer, primary_key=True)
+    categoria = db.Column(db.String(50), nullable=False)
+    valor_limite = db.Column(db.Float, nullable=False)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
 
 class Categoria(db.Model):
     __tablename__ = 'categoria'
@@ -48,6 +56,5 @@ class Movimentacao(db.Model):
     forma_pagto = db.Column(db.String(50))
     categoria = db.Column(db.String(50))
     subcategoria = db.Column(db.String(50))
-    # Aumentamos o limite de caracteres para caber a palavra "Investimento"
     tipo_movimentacao = db.Column(db.String(20), nullable=False) 
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)

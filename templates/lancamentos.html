@@ -26,24 +26,17 @@
         <nav class="col-md-2 d-none d-md-block sidebar shadow-lg">
             <h3 class="text-center mb-5 mt-3 fw-bold"><i class="bi bi-leaf me-2"></i>Meu Financeiro</h3>
             <ul class="nav flex-column gap-2">
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('dashboard') }}"><i class="bi bi-pie-chart-fill me-2"></i> Dashboard</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="{{ url_for('lancamentos') }}"><i class="bi bi-card-list me-2"></i> Lançamentos</a>
-                </li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}"><i class="bi bi-pie-chart-fill me-2"></i> Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link active" href="{{ url_for('lancamentos') }}"><i class="bi bi-card-list me-2"></i> Lançamentos</a></li>
                 <li class="nav-item mt-2 border-top pt-2 border-secondary">
                     <a class="nav-link" data-bs-toggle="collapse" href="#cadastrosMenu" role="button" aria-expanded="false">
                         <i class="bi bi-folder-fill me-2"></i> Cadastros <i class="bi bi-chevron-down float-end mt-1" style="font-size: 0.8rem;"></i>
                     </a>
                     <div class="collapse" id="cadastrosMenu">
                         <ul class="nav flex-column ms-3 mt-1 gap-1">
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('gerenciar_categorias') }}" style="font-size: 0.9rem;"><i class="bi bi-tags-fill me-2"></i> Categorias</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('gerenciar_formas') }}" style="font-size: 0.9rem;"><i class="bi bi-credit-card-fill me-2"></i> Pagamentos</a>
-                            </li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('gerenciar_categorias') }}" style="font-size: 0.9rem;"><i class="bi bi-tags-fill me-2"></i> Categorias</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('orcamentos') }}" style="font-size: 0.9rem;"><i class="bi bi-bullseye me-2"></i> Orçamentos</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('gerenciar_formas') }}" style="font-size: 0.9rem;"><i class="bi bi-credit-card-fill me-2"></i> Pagamentos</a></li>
                         </ul>
                     </div>
                 </li>
@@ -57,35 +50,35 @@
                 <h2 class="fw-bold">Gerenciar Lançamentos</h2>
             </div>
 
-            <div class="row g-3 mb-4">
-                <div class="col-md-3">
-                    <div class="card card-custom p-3 bg-white border-start border-success border-5">
-                        <h6 class="text-success fw-bold small">TOTAL ENTRADA</h6>
-                        <h3 class="fw-bold text-dark">R$ {{ t_entrada|formato_moeda }}</h3>
+            <div class="card card-custom p-3 mb-4 bg-white">
+                <form method="GET" action="{{ url_for('lancamentos') }}" class="row g-3 align-items-end" autocomplete="off">
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold text-muted">Exibir a partir de:</label>
+                        <input type="date" name="data_inicio" class="form-control" value="{{ data_inicio }}">
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card card-custom p-3 bg-white border-start border-danger border-5">
-                        <h6 class="text-danger fw-bold small">TOTAL SAÍDA</h6>
-                        <h3 class="fw-bold text-dark">R$ {{ t_saida|formato_moeda }}</h3>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold text-muted">Até:</label>
+                        <input type="date" name="data_fim" class="form-control" value="{{ data_fim }}">
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card card-custom p-3 bg-white border-start border-info border-5">
-                        <h6 class="text-info fw-bold small">INVESTIMENTOS</h6>
-                        <h3 class="fw-bold text-dark">R$ {{ t_investimento|formato_moeda }}</h3>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-salvar w-100 shadow-sm"><i class="bi bi-funnel-fill me-2"></i>Buscar</button>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card card-custom p-3 text-white shadow" style="background-color: var(--cor-sidebar);">
-                        <h6 class="fw-bold opacity-75 small">SALDO GERAL</h6>
-                        <h3 class="fw-bold">R$ {{ caixa|formato_moeda }}</h3>
+                    <div class="col-md-2">
+                        <a href="{{ url_for('lancamentos') }}" class="btn btn-outline-secondary w-100">Limpar</a>
                     </div>
-                </div>
+                </form>
             </div>
 
-            <div class="card card-custom p-4 mb-4 bg-white">
-                <form class="row g-3" method="POST">
+            <div class="row g-3 mb-4">
+                <div class="col-md-3"><div class="card card-custom p-3 bg-white border-start border-success border-5"><h6 class="text-success fw-bold small">TOTAL ENTRADA (MÊS)</h6><h3 class="fw-bold text-dark">R$ {{ t_entrada|formato_moeda }}</h3></div></div>
+                <div class="col-md-3"><div class="card card-custom p-3 bg-white border-start border-danger border-5"><h6 class="text-danger fw-bold small">TOTAL SAÍDA (MÊS)</h6><h3 class="fw-bold text-dark">R$ {{ t_saida|formato_moeda }}</h3></div></div>
+                <div class="col-md-3"><div class="card card-custom p-3 bg-white border-start border-info border-5"><h6 class="text-info fw-bold small">INVESTIMENTO (TOTAL)</h6><h3 class="fw-bold text-dark">R$ {{ t_investimento|formato_moeda }}</h3></div></div>
+                <div class="col-md-3"><div class="card card-custom p-3 text-white shadow" style="background-color: var(--cor-sidebar);"><h6 class="fw-bold opacity-75 small">SALDO GERAL DA CONTA</h6><h3 class="fw-bold">R$ {{ caixa|formato_moeda }}</h3></div></div>
+            </div>
+
+            <div class="card card-custom p-4 mb-4 bg-white border border-secondary border-opacity-25">
+                <h5 class="mb-3 fw-bold" style="color: var(--cor-sidebar);"><i class="bi bi-plus-circle me-2"></i>Novo Lançamento</h5>
+                <form class="row g-3" method="POST" autocomplete="off">
                     <div class="col-md-2">
                         <label class="form-label small fw-bold text-muted">Operação</label>
                         <select name="tipo_movimentacao" class="form-select border-2">
@@ -96,11 +89,15 @@
                     </div>
                     <div class="col-md-3">
                         <label class="form-label small fw-bold text-muted">Descrição</label>
-                        <input type="text" name="descricao" class="form-control" required>
+                        <input type="text" name="descricao" class="form-control" placeholder="Ex: Mercado..." required autocomplete="off">
                     </div>
                     <div class="col-md-2">
-                        <label class="form-label small fw-bold text-muted">Valor (R$)</label>
-                        <input type="text" name="valor" class="form-control" placeholder="0,00" required>
+                        <label class="form-label small fw-bold text-muted">Valor Total (R$)</label>
+                        <input type="text" name="valor" class="form-control" placeholder="0,00" required autocomplete="off">
+                    </div>
+                    <div class="col-md-1">
+                        <label class="form-label small fw-bold text-muted">Parcelas</label>
+                        <input type="number" name="parcelas" class="form-control" value="1" min="1" required>
                     </div>
                     <div class="col-md-2">
                         <label class="form-label small fw-bold text-muted">Categoria</label>
@@ -108,7 +105,7 @@
                             {% for c in categorias %}<option value="{{ c.nome }}">{{ c.nome }}</option>{% endfor %}
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <label class="form-label small fw-bold text-muted">Subcategoria</label>
                         <select name="subcategoria" class="form-select">
                             <option value="">Nenhuma</option>
@@ -143,28 +140,18 @@
                         <tr class="border-bottom">
                             <td class="small text-secondary fw-bold">{{ m.data.strftime('%d/%m/%Y') }}</td>
                             <td class="fw-bold">{{ m.descricao }}</td>
-                            <td>
-                                {% set forma_obj = formas | selectattr('nome', 'equalto', m.forma_pagto) | list %}
-                                {% if forma_obj %}
-                                    <span class="badge bg-light text-dark border"><i class="bi {{ forma_obj[0].icone }} me-1"></i> {{ m.forma_pagto }}</span>
-                                {% else %}
-                                    <span class="badge bg-light text-dark border">{{ m.forma_pagto }}</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% set cat_obj = categorias | selectattr('nome', 'equalto', m.categoria) | list %}
-                                {% if cat_obj %}
-                                    <i class="bi {{ cat_obj[0].icone }} me-1" style="color: var(--cor-sidebar)"></i>
-                                {% endif %}
-                                {{ m.categoria }} {% if m.subcategoria %}<small class="text-muted">/ {{ m.subcategoria }}</small>{% endif %}
-                            </td>
+                            <td><span class="badge bg-light text-dark border">{{ m.forma_pagto }}</span></td>
+                            <td>{{ m.categoria }}</td>
                             <td class="fw-bold {% if m.tipo_movimentacao == 'Entrada' %}text-success{% elif m.tipo_movimentacao == 'Saída' %}text-danger{% else %}text-info{% endif %}">
                                 R$ {{ m.valor|formato_moeda }}
                             </td>
                             <td class="text-center">
-                                <a href="{{ url_for('excluir_mov', id=m.id) }}" class="text-danger" onclick="return confirm('Excluir?')"><i class="bi bi-trash3-fill"></i></a>
+                                <a href="{{ url_for('editar_mov', id=m.id) }}" class="btn btn-sm btn-outline-primary border-0 rounded-circle me-1" title="Editar"><i class="bi bi-pencil-fill"></i></a>
+                                <a href="{{ url_for('excluir_mov', id=m.id) }}" class="btn btn-sm btn-outline-danger border-0 rounded-circle" onclick="return confirm('Excluir?')" title="Excluir"><i class="bi bi-trash3-fill"></i></a>
                             </td>
                         </tr>
+                        {% else %}
+                        <tr><td colspan="6" class="text-center text-muted py-4">Nenhuma movimentação neste período.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
