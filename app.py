@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from models import db, Usuario, Movimentacao, FormaPagamento
+from models import db, Usuario, Movimentacao, FormaPagamento, Categoria, Subcategoria
 from datetime import datetime
 
 app = Flask(__name__)
@@ -17,7 +17,6 @@ login_manager.init_app(app)
 def load_user(user_id):
     return Usuario.query.get(int(user_id))
 
-# Filtro para formatar moeda brasileira
 @app.template_filter('formato_moeda')
 def formato_moeda(valor):
     return f"{valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
@@ -25,34 +24,28 @@ def formato_moeda(valor):
 with app.app_context():
     db.create_all()
 
-# --- ROTA INICIAL ---
 @app.route('/')
 def index():
     return redirect(url_for('login'))
 
-# --- ROTA DE CADASTRO ---
 @app.route('/cadastro', methods=['GET', 'POST'])
 def cadastro():
     if request.method == 'POST':
-        nome = request.form.get('nome')
-        telefone = request.form.get('telefone')
-        cpf = request.form.get('cpf')
-        senha = request.form.get('senha')
-        
-        novo_usuario = Usuario(nome_completo=nome, telefone=telefone, cpf=cpf, senha=senha)
-        
+        novo_usuario = Usuario(
+            nome_completo=request.form.get('nome'),
+            telefone=request.form.get('telefone'),
+            cpf=request.form.get('cpf'),
+            senha=request.form.get('senha')
+        )
         try:
             db.session.add(novo_usuario)
             db.session.commit()
-            flash('Conta criada com sucesso!', 'success')
             return redirect(url_for('login'))
         except:
             db.session.rollback()
-            flash('Erro: Este CPF já está cadastrado.', 'danger')
-            
+            flash('Erro: CPF já cadastrado.', 'danger')
     return render_template('cadastro.html')
 
-# --- ROTA DE LOGIN ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -60,54 +53,110 @@ def login():
         if user and user.senha == request.form.get('senha'):
             login_user(user)
             
-            # Criar formas padrão se o usuário não tiver nenhuma
             if not FormaPagamento.query.filter_by(usuario_id=user.id).first():
-                padroes = ['Pix', 'Dinheiro Físico', 'Cartão 1', 'Cartão 2']
-                for p in padroes:
-                    db.session.add(FormaPagamento(nome=p, usuario_id=user.id))
-                db.session.commit()
-                
+                pagamentos_padrao = [
+                    ('Pix', 'bi-phone'), 
+                    ('Dinheiro Físico', 'bi-cash-stack'), 
+                    ('Cartão de Crédito', 'bi-credit-card'), 
+                    ('Cartão de Débito', 'bi-credit-card-2-front')
+                ]
+                for nome, icone in pagamentos_padrao:
+                    db.session.add(FormaPagamento(nome=nome, icone=icone, usuario_id=user.id))
+            
+            if not Categoria.query.filter_by(usuario_id=user.id).first():
+                cats_padrao = [
+                    ('Moradia', 'bi-house-door'), ('Alimentação', 'bi-cart'),
+                    ('Transporte', 'bi-car-front'), ('Lazer', 'bi-balloon'),
+                    ('Saúde', 'bi-heart-pulse'), ('Salário', 'bi-cash-coin'),
+                    ('Investimentos', 'bi-graph-up-arrow')
+                ]
+                for nome, icone in cats_padrao:
+                    db.session.add(Categoria(nome=nome, icone=icone, usuario_id=user.id))
+            
+            db.session.commit()
             return redirect(url_for('dashboard'))
         flash('CPF ou Senha incorretos.', 'danger')
     return render_template('login.html')
 
-# --- DASHBOARD ---
-@app.route('/dashboard', methods=['GET', 'POST'])
+# --- ROTA: DASHBOARD (COM FILTRO DE DATAS) ---
+@app.route('/dashboard', methods=['GET'])
 @login_required
 def dashboard():
+    data_inicio = request.args.get('data_inicio')
+    data_fim = request.args.get('data_fim')
+
+    query = Movimentacao.query.filter_by(usuario_id=current_user.id)
+    
+    # Aplicando os filtros se o usuário selecionou as datas
+    if data_inicio:
+        query = query.filter(Movimentacao.data >= datetime.strptime(data_inicio, '%Y-%m-%d').date())
+    if data_fim:
+        query = query.filter(Movimentacao.data <= datetime.strptime(data_fim, '%Y-%m-%d').date())
+
+    movs = query.all()
+    
+    t_entrada = sum(m.valor for m in movs if m.tipo_movimentacao == 'Entrada')
+    t_saida = sum(m.valor for m in movs if m.tipo_movimentacao == 'Saída')
+    t_investimento = sum(m.valor for m in movs if m.tipo_movimentacao == 'Investimento')
+    caixa = t_entrada - t_saida - t_investimento
+
+    # Gráfico
+    gastos_cat = {}
+    for m in movs:
+        if m.tipo_movimentacao == 'Saída':
+            gastos_cat[m.categoria] = gastos_cat.get(m.categoria, 0) + m.valor
+
+    return render_template('dashboard.html', t_entrada=t_entrada, t_saida=t_saida, 
+                           t_investimento=t_investimento, caixa=caixa,
+                           labels_cat=list(gastos_cat.keys()), 
+                           valores_cat=list(gastos_cat.values()),
+                           data_inicio=data_inicio, data_fim=data_fim)
+
+# --- ROTA: LANÇAMENTOS ---
+@app.route('/lancamentos', methods=['GET', 'POST'])
+@login_required
+def lancamentos():
     if request.method == 'POST':
         valor_raw = request.form.get('valor').replace('.', '').replace(',', '.')
         nova = Movimentacao(
             descricao=request.form.get('descricao'),
             valor=float(valor_raw),
             forma_pagto=request.form.get('forma_pagto'),
+            categoria=request.form.get('categoria'),
+            subcategoria=request.form.get('subcategoria', ''),
             tipo_movimentacao=request.form.get('tipo_movimentacao'),
             data=datetime.strptime(request.form.get('data'), '%Y-%m-%d').date(),
             usuario_id=current_user.id
         )
         db.session.add(nova)
         db.session.commit()
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('lancamentos'))
 
     movs = Movimentacao.query.filter_by(usuario_id=current_user.id).order_by(Movimentacao.data.desc()).all()
     formas = FormaPagamento.query.filter_by(usuario_id=current_user.id).all()
+    categorias = Categoria.query.filter_by(usuario_id=current_user.id).all()
+    subcategorias = Subcategoria.query.filter_by(usuario_id=current_user.id).all()
     
+    # Reativando os cálculos para a tela de Lançamentos
     t_entrada = sum(m.valor for m in movs if m.tipo_movimentacao == 'Entrada')
     t_saida = sum(m.valor for m in movs if m.tipo_movimentacao == 'Saída')
-    
-    return render_template('dashboard.html', movimentacoes=movs, t_entrada=t_entrada, 
-                           t_saida=t_saida, caixa=t_entrada - t_saida, formas=formas)
+    t_investimento = sum(m.valor for m in movs if m.tipo_movimentacao == 'Investimento')
+    caixa = t_entrada - t_saida - t_investimento
 
-# --- GERENCIAR FORMAS DE PAGTO ---
+    return render_template('lancamentos.html', movimentacoes=movs, formas=formas, 
+                           categorias=categorias, subcategorias=subcategorias,
+                           t_entrada=t_entrada, t_saida=t_saida, 
+                           t_investimento=t_investimento, caixa=caixa)
+
 @app.route('/config/formas', methods=['GET', 'POST'])
 @login_required
 def gerenciar_formas():
     if request.method == 'POST':
         nome = request.form.get('nome')
-        db.session.add(FormaPagamento(nome=nome, usuario_id=current_user.id))
+        icone = request.form.get('icone')
+        db.session.add(FormaPagamento(nome=nome, icone=icone, usuario_id=current_user.id))
         db.session.commit()
         return redirect(url_for('gerenciar_formas'))
-    
     formas = FormaPagamento.query.filter_by(usuario_id=current_user.id).all()
     return render_template('formas_pagamento.html', formas=formas)
 
@@ -120,6 +169,30 @@ def excluir_forma(id):
         db.session.commit()
     return redirect(url_for('gerenciar_formas'))
 
+@app.route('/config/categorias', methods=['GET', 'POST'])
+@login_required
+def gerenciar_categorias():
+    if request.method == 'POST':
+        tipo = request.form.get('tipo_form')
+        if tipo == 'categoria':
+            db.session.add(Categoria(nome=request.form.get('nome'), icone=request.form.get('icone'), usuario_id=current_user.id))
+        elif tipo == 'subcategoria':
+            db.session.add(Subcategoria(nome=request.form.get('nome'), categoria_id=request.form.get('categoria_id'), usuario_id=current_user.id))
+        db.session.commit()
+        return redirect(url_for('gerenciar_categorias'))
+    categorias = Categoria.query.filter_by(usuario_id=current_user.id).all()
+    return render_template('categorias.html', categorias=categorias)
+
+@app.route('/excluir_categoria/<int:id>')
+@login_required
+def excluir_categoria(id):
+    cat = Categoria.query.get_or_404(id)
+    if cat.usuario_id == current_user.id:
+        Subcategoria.query.filter_by(categoria_id=cat.id).delete()
+        db.session.delete(cat)
+        db.session.commit()
+    return redirect(url_for('gerenciar_categorias'))
+
 @app.route('/excluir_mov/<int:id>')
 @login_required
 def excluir_mov(id):
@@ -127,7 +200,7 @@ def excluir_mov(id):
     if mov.usuario_id == current_user.id:
         db.session.delete(mov)
         db.session.commit()
-    return redirect(url_for('dashboard'))
+    return redirect(url_for('lancamentos'))
 
 @app.route('/logout')
 def logout():

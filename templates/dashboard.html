@@ -2,142 +2,155 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Controle Financeiro</title>
+    <title>Dashboard - Meu Financeiro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { background-color: #f4f7f6; color: #333; }
-        .sidebar { min-height: 100vh; background: #2c3e50; color: white; padding: 20px; }
-        .card-custom { border: none; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .btn-logout { position: absolute; top: 20px; right: 20px; }
-        .nav-link:hover { background-color: #34495e; border-radius: 5px; }
+        :root { --cor-fundo: #FDFDE5; --cor-sidebar: #5F7254; --cor-botao: #783E19; --cor-botao-hover: #5c2e11; }
+        body { background-color: var(--cor-fundo); color: #333; font-family: 'Raleway', sans-serif; }
+        .sidebar { background-color: var(--cor-sidebar); color: white; min-height: 100vh; padding: 20px; }
+        .nav-link { color: rgba(255,255,255,0.8); font-weight: 600; }
+        .nav-link:hover, .nav-link.active { color: white; background-color: rgba(255,255,255,0.1); border-radius: 8px; }
+        .card-custom { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .btn-salvar { background-color: var(--cor-botao); color: white; font-weight: 700; border: none; }
+        .btn-salvar:hover { background-color: var(--cor-botao-hover); color: white; }
+        .btn-logout { position: absolute; top: 20px; right: 20px; border-color: #dc3545; color: #dc3545; }
+        .btn-logout:hover { background-color: #dc3545; color: white; }
     </style>
 </head>
 <body>
 
 <div class="container-fluid">
     <div class="row">
-        <nav class="col-md-2 d-none d-md-block sidebar shadow">
-            <h4 class="text-center mb-4">💰 Finanças</h4>
-            <hr>
-            <ul class="nav flex-column">
-                <li class="nav-item mb-2">
-                    <a class="nav-link text-white active" href="{{ url_for('dashboard') }}">
-                        <i class="bi bi-speedometer2 me-2"></i> Dashboard
-                    </a>
+        <nav class="col-md-2 d-none d-md-block sidebar shadow-lg">
+            <h3 class="text-center mb-5 mt-3 fw-bold"><i class="bi bi-leaf me-2"></i>Meu Financeiro</h3>
+            <ul class="nav flex-column gap-2">
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('dashboard') }}"><i class="bi bi-pie-chart-fill me-2"></i> Dashboard</a>
                 </li>
-                <li class="nav-item mb-2">
-                    <a class="nav-link text-white" href="{{ url_for('gerenciar_formas') }}">
-                        <i class="bi bi-credit-card me-2"></i> Formas de Pagto
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('lancamentos') }}"><i class="bi bi-card-list me-2"></i> Lançamentos</a>
+                </li>
+                <li class="nav-item mt-2 border-top pt-2 border-secondary">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#cadastrosMenu" role="button" aria-expanded="false">
+                        <i class="bi bi-folder-fill me-2"></i> Cadastros <i class="bi bi-chevron-down float-end mt-1" style="font-size: 0.8rem;"></i>
                     </a>
+                    <div class="collapse" id="cadastrosMenu">
+                        <ul class="nav flex-column ms-3 mt-1 gap-1">
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('gerenciar_categorias') }}" style="font-size: 0.9rem;"><i class="bi bi-tags-fill me-2"></i> Categorias</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('gerenciar_formas') }}" style="font-size: 0.9rem;"><i class="bi bi-credit-card-fill me-2"></i> Pagamentos</a>
+                            </li>
+                        </ul>
+                    </div>
                 </li>
             </ul>
         </nav>
 
-        <main class="col-md-10 ms-sm-auto px-md-4 position-relative">
-            <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-sm btn-logout shadow-sm">
-                <i class="bi bi-box-arrow-right me-1"></i> Sair
-            </a>
+        <main class="col-md-10 ms-sm-auto px-md-5 position-relative">
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-sm btn-logout fw-bold rounded-pill px-4">Sair</a>
 
-            <div class="pt-3 pb-2 mb-3 border-bottom mt-4">
-                <h2>Olá, <span class="text-primary">{{ current_user.nome_completo }}</span> 👋</h2>
+            <div class="pt-4 pb-2 mb-4 border-bottom border-dark-subtle mt-3 d-flex justify-content-between align-items-end">
+                <h2 class="fw-bold m-0">Visão Geral</h2>
             </div>
 
-            <div class="row g-3 mb-4">
-                <div class="col-md-4">
-                    <div class="card card-custom bg-success text-white p-3">
-                        <h6 class="opacity-75">Total Entrada</h6>
-                        <h3>R$ {{ t_entrada|formato_moeda }}</h3>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card card-custom bg-danger text-white p-3">
-                        <h6 class="opacity-75">Total Saída</h6>
-                        <h3>R$ {{ t_saida|formato_moeda }}</h3>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card card-custom bg-primary text-white p-3">
-                        <h6 class="opacity-75">Saldo em Caixa</h6>
-                        <h3>R$ {{ caixa|formato_moeda }}</h3>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card card-custom p-4 mb-4 border-0">
-                <h5 class="mb-3 text-secondary"><i class="bi bi-plus-circle me-2"></i>Novo Lançamento</h5>
-                <form class="row g-3" method="POST">
-                    <div class="col-md-2">
-                        <label class="form-label small fw-bold">Operação</label>
-                        <select name="tipo_movimentacao" class="form-select border-2">
-                            <option value="Saída">🔴 Saída</option>
-                            <option value="Entrada">🟢 Entrada</option>
-                        </select>
+            <div class="card card-custom p-3 mb-4 bg-white">
+                <form method="GET" action="{{ url_for('dashboard') }}" class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold text-muted">Data Inicial</label>
+                        <input type="date" name="data_inicio" class="form-control" value="{{ data_inicio or '' }}">
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label small fw-bold">Descrição</label>
-                        <input type="text" name="descricao" class="form-control" placeholder="Ex: Salário, Mercado..." required>
+                        <label class="form-label small fw-bold text-muted">Data Final</label>
+                        <input type="date" name="data_fim" class="form-control" value="{{ data_fim or '' }}">
                     </div>
                     <div class="col-md-2">
-                        <label class="form-label small fw-bold">Valor (R$)</label>
-                        <input type="text" name="valor" class="form-control" placeholder="0,00" required>
+                        <button type="submit" class="btn btn-salvar w-100 shadow-sm"><i class="bi bi-funnel-fill me-2"></i>Filtrar</button>
                     </div>
                     <div class="col-md-2">
-                        <label class="form-label small fw-bold">Forma de Pagto</label>
-                        <select name="forma_pagto" class="form-select">
-                            {% for f in formas %}
-                            <option value="{{ f.nome }}">{{ f.nome }}</option>
-                            {% endfor %}
-                        </select>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary w-100">Limpar</a>
                     </div>
-                    <div class="col-md-2">
-                        <label class="form-label small fw-bold">Data</label>
-                        <input type="date" name="data" class="form-control" required>
-                    </div>
-                    <div class="col-md-1 d-flex align-items-end">
-                        <button type="submit" class="btn btn-dark w-100 fw-bold">Add</button>
-                    </div>
-                    <input type="hidden" name="tipo_gasto" value="Eventual">
                 </form>
             </div>
 
-            <div class="table-responsive bg-white rounded shadow-sm p-3">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Data</th>
-                            <th>Descrição</th>
-                            <th>Forma de Pagto</th> <th>Valor</th>
-                            <th class="text-center">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for m in movimentacoes %}
-                        <tr>
-                            <td class="small">{{ m.data.strftime('%d/%m/%Y') }}</td>
-                            <td class="fw-bold">{{ m.descricao }}</td>
-                            <td><span class="badge bg-light text-dark border">{{ m.forma_pagto }}</span></td>
-                            <td class="fw-bold {% if m.tipo_movimentacao == 'Entrada' %}text-success{% else %}text-danger{% endif %}">
-                                R$ {{ m.valor|formato_moeda }}
-                            </td>
-                            <td class="text-center">
-                                <a href="{{ url_for('excluir_mov', id=m.id) }}" class="btn btn-sm btn-outline-danger border-0" onclick="return confirm('Deseja excluir este lançamento?')">
-                                    <i class="bi bi-trash3"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                        {% if not movimentacoes %}
-                        <tr>
-                            <td colspan="5" class="text-center text-muted py-4">Nenhum registro encontrado.</td>
-                        </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="card card-custom p-3 bg-white border-start border-success border-5">
+                        <h6 class="text-success fw-bold small">TOTAL ENTRADA</h6>
+                        <h3 class="fw-bold text-dark">R$ {{ t_entrada|formato_moeda }}</h3>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card card-custom p-3 bg-white border-start border-danger border-5">
+                        <h6 class="text-danger fw-bold small">TOTAL SAÍDA</h6>
+                        <h3 class="fw-bold text-dark">R$ {{ t_saida|formato_moeda }}</h3>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card card-custom p-3 bg-white border-start border-info border-5">
+                        <h6 class="text-info fw-bold small">INVESTIMENTOS</h6>
+                        <h3 class="fw-bold text-dark">R$ {{ t_investimento|formato_moeda }}</h3>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card card-custom p-3 text-white shadow" style="background-color: var(--cor-sidebar);">
+                        <h6 class="fw-bold opacity-75 small">SALDO DO PERÍODO</h6>
+                        <h3 class="fw-bold">R$ {{ caixa|formato_moeda }}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-5">
+                <div class="col-md-6">
+                    <div class="card card-custom p-4 bg-white h-100">
+                        <h5 class="fw-bold mb-4 text-center" style="color: var(--cor-sidebar);">Despesas por Categoria</h5>
+                        <div style="position: relative; height:300px; width:100%">
+                            {% if valores_cat %}
+                                <canvas id="graficoCategorias"></canvas>
+                            {% else %}
+                                <p class="text-center text-muted mt-5">Nenhum gasto neste período.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card card-custom p-4 bg-white h-100">
+                        <h5 class="fw-bold mb-4 text-center" style="color: var(--cor-sidebar);">Balanço do Período</h5>
+                        <div style="position: relative; height:300px; width:100%">
+                            <canvas id="graficoBalanco"></canvas>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
 </div>
 
-</body>
-</html>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    Chart.defaults.font.family = "'Raleway', sans-serif";
+
+    {% if valores_cat %}
+    const ctxCategorias = document.getElementById('graficoCategorias').getContext('2d');
+    new Chart(ctxCategorias, {
+        type: 'doughnut',
+        data: {
+            labels: {{ labels_cat | tojson | safe }},
+            datasets: [{
+                data: {{ valores_cat | tojson | safe }},
+                backgroundColor: ['#5F7254', '#783E19', '#E0A96D', '#201E20', '#DDC3A5', '#8E8D8A', '#E85A4F'],
+                borderWidth: 2, borderColor: '#fff'
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+    });
+    {% endif %}
+
+    const ctxBalanco = document.getElementById('graficoBalanco').getContext('2d');
+    new Chart(ctxBalanco, {
+        type: '
