@@ -87,12 +87,13 @@
                     <div class="card card-custom p-3 text-white shadow" style="background-color: var(--cor-sidebar);">
                         <h6 class="fw-bold opacity-75 small">SALDO GERAL DA CONTA</h6>
                         <h3 class="fw-bold mb-0">R$ {{ caixa|formato_moeda }}</h3>
+                        <small class="fw-bold" style="font-size: 0.75rem; color: #e9f0e6;">Patrimônio Total: R$ {{ patrimonio_total|formato_moeda }}</small>
                     </div>
                 </div>
             </div>
 
             <div class="row g-4 mb-4">
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="card card-custom p-4 bg-white h-100">
                         <h5 class="fw-bold mb-4 text-center" style="color: var(--cor-sidebar);"><i class="bi bi-bullseye me-2"></i>Metas do Período</h5>
                         {% for orc in orcamentos %}
@@ -112,18 +113,22 @@
                         {% endfor %}
                     </div>
                 </div>
-
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="card card-custom p-4 bg-white h-100">
-                        <h5 class="fw-bold mb-4 text-center" style="color: var(--cor-sidebar);">Despesas por Categoria</h5>
+                        <h5 class="fw-bold mb-4 text-center" style="color: var(--cor-sidebar);">Balanço do Período</h5>
+                        <div style="position: relative; height:250px; width:100%"><canvas id="graficoBalanco"></canvas></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card card-custom p-4 bg-white h-100">
+                        <h5 class="fw-bold mb-4 text-center" style="color: var(--cor-sidebar);">Despesas por Categoria e Subcategoria</h5>
                         <div style="position: relative; height:250px; width:100%"><canvas id="graficoCategorias"></canvas></div>
                     </div>
                 </div>
-                
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="card card-custom p-4 bg-white h-100">
-                        <h5 class="fw-bold mb-4 text-center" style="color: var(--cor-sidebar);">Resumo do Período</h5>
-                        <div style="position: relative; height:250px; width:100%"><canvas id="graficoBalanco"></canvas></div>
+                        <h5 class="fw-bold mb-4 text-center" style="color: var(--cor-sidebar);">Despesas por Condição de Pagto</h5>
+                        <div style="position: relative; height:250px; width:100%"><canvas id="graficoPagamentos"></canvas></div>
                     </div>
                 </div>
             </div>
@@ -151,7 +156,7 @@
 <script>
     Chart.defaults.font.family = "'Raleway', sans-serif";
     
-    // 1. Gráfico de Categorias (Rosca)
+    // 1. Gráfico de Categorias e Subcategorias
     const labelsCat = {{ labels_cat | tojson | safe }};
     const valoresCat = {{ valores_cat | tojson | safe }};
     const coresCat = {{ cores_cat | tojson | safe }};
@@ -160,107 +165,56 @@
         const ctxCategorias = document.getElementById('graficoCategorias').getContext('2d');
         new Chart(ctxCategorias, {
             type: 'doughnut',
-            data: {
-                labels: labelsCat,
-                datasets: [{
-                    data: valoresCat,
-                    backgroundColor: coresCat,
-                    borderWidth: 2, borderColor: '#fff'
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            data: { labels: labelsCat, datasets: [{ data: valoresCat, backgroundColor: coresCat, borderWidth: 2, borderColor: '#fff' }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
         });
     }
 
-    // 2. Gráfico Balanço Simples (Barras)
+    // 2. Gráfico de Formas de Pagamento
+    const labelsPagto = {{ labels_pagto | tojson | safe }};
+    const valoresPagto = {{ valores_pagto | tojson | safe }};
+    const coresPagto = {{ cores_pagto | tojson | safe }};
+
+    if (labelsPagto.length > 0) {
+        const ctxPagto = document.getElementById('graficoPagamentos').getContext('2d');
+        new Chart(ctxPagto, {
+            type: 'pie',
+            data: { labels: labelsPagto, datasets: [{ data: valoresPagto, backgroundColor: coresPagto, borderWidth: 2, borderColor: '#fff' }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+        });
+    }
+
+    // 3. Gráfico Balanço Simples (Barras)
     const ctxBalanco = document.getElementById('graficoBalanco').getContext('2d');
     new Chart(ctxBalanco, {
         type: 'bar',
         data: {
             labels: ['Entradas', 'Saídas'],
             datasets: [{
-                label: 'Valor (R$)',
-                data: [{{ t_entrada }}, {{ t_saida }}],
-                backgroundColor: ['rgba(25, 135, 84, 0.8)', 'rgba(220, 53, 69, 0.8)'],
-                borderRadius: 8
+                label: 'Valor (R$)', data: [{{ t_entrada }}, {{ t_saida }}],
+                backgroundColor: ['rgba(25, 135, 84, 0.8)', 'rgba(220, 53, 69, 0.8)'], borderRadius: 8
             }]
         },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
     });
 
-    // 3. NOVO: Gráfico Misto Mês a Mês
+    // 4. Gráfico Misto Mês a Mês
     const ctxMensal = document.getElementById('graficoMensalMixto').getContext('2d');
     new Chart(ctxMensal, {
-        type: 'bar', // Tipo principal
+        type: 'bar',
         data: {
             labels: {{ labels_meses | tojson | safe }},
             datasets: [
-                {
-                    label: 'Entradas',
-                    type: 'bar',
-                    data: {{ dados_entradas_mes | tojson | safe }},
-                    backgroundColor: 'rgba(25, 135, 84, 0.8)', // Verde
-                    borderRadius: 4
-                },
-                {
-                    label: 'Saídas',
-                    type: 'bar',
-                    data: {{ dados_saidas_mes | tojson | safe }},
-                    backgroundColor: 'rgba(220, 53, 69, 0.8)', // Vermelho
-                    borderRadius: 4
-                },
-                {
-                    label: 'Investimentos',
-                    type: 'line',
-                    data: {{ dados_investimentos_mes | tojson | safe }},
-                    borderColor: '#0dcaf0', // Azul claro
-                    backgroundColor: '#0dcaf0',
-                    borderWidth: 3,
-                    tension: 0.3,
-                    fill: false
-                },
-                {
-                    label: 'Teto de Orçamento',
-                    type: 'line',
-                    data: {{ dados_orcamento_mes | tojson | safe }},
-                    borderColor: '#ffc107', // Amarelo
-                    backgroundColor: '#ffc107',
-                    borderDash: [5, 5],
-                    borderWidth: 2,
-                    pointRadius: 4,
-                    fill: false
-                }
+                { label: 'Entradas', type: 'bar', data: {{ dados_entradas_mes | tojson | safe }}, backgroundColor: 'rgba(25, 135, 84, 0.8)', borderRadius: 4 },
+                { label: 'Saídas', type: 'bar', data: {{ dados_saidas_mes | tojson | safe }}, backgroundColor: 'rgba(220, 53, 69, 0.8)', borderRadius: 4 },
+                { label: 'Investimentos', type: 'line', data: {{ dados_investimentos_mes | tojson | safe }}, borderColor: '#0dcaf0', backgroundColor: '#0dcaf0', borderWidth: 3, tension: 0.3, fill: false },
+                { label: 'Teto de Orçamento Total', type: 'line', data: {{ dados_orcamento_mes | tojson | safe }}, borderColor: '#ffc107', backgroundColor: '#ffc107', borderDash: [5, 5], borderWidth: 2, pointRadius: 4, fill: false }
             ]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: {
-                mode: 'index',
-                intersect: false,
-            },
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top',
-                    labels: { usePointStyle: true, padding: 20 }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            let label = context.dataset.label || '';
-                            if (label) { label += ': '; }
-                            if (context.parsed.y !== null) {
-                                label += new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(context.parsed.y);
-                            }
-                            return label;
-                        }
-                    }
-                }
-            },
-            scales: {
-                y: { beginAtZero: true }
-            }
+            responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false, },
+            plugins: { legend: { display: true, position: 'top', labels: { usePointStyle: true, padding: 20 } } },
+            scales: { y: { beginAtZero: true } }
         }
     });
 </script>

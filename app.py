@@ -94,6 +94,9 @@ def dashboard():
 
     t_investimento_geral = sum(m.valor for m in todas_movs if m.tipo_movimentacao == 'Investimento')
     t_saida_futura = sum(m.valor for m in todas_movs if m.tipo_movimentacao == 'Saída' and m.data > data_fim_obj)
+    
+    # NOVO: Patrimônio Total (Saldo da Conta + Investimentos)
+    patrimonio_total = caixa_atual + t_investimento_geral
 
     movs_periodo = [m for m in todas_movs if datetime.strptime(data_inicio, '%Y-%m-%d').date() <= m.data <= data_fim_obj]
     
@@ -101,16 +104,23 @@ def dashboard():
     t_saida_periodo = sum(m.valor for m in movs_periodo if m.tipo_movimentacao == 'Saída')
 
     categorias_db = Categoria.query.filter_by(usuario_id=current_user.id).all()
-    mapa_cores = {c.nome: c.cor for c in categorias_db}
+    mapa_cores_cat = {c.nome: c.cor for c in categorias_db}
+    
+    pagamentos_db = FormaPagamento.query.filter_by(usuario_id=current_user.id).all()
+    mapa_cores_pagto = {p.nome: p.cor for p in pagamentos_db}
 
-    gastos_cat = {}
+    gastos_cat_sub = {}
+    gastos_pagto = {}
+    
     for m in movs_periodo:
         if m.tipo_movimentacao == 'Saída':
-            gastos_cat[m.categoria] = gastos_cat.get(m.categoria, 0) + m.valor
+            nome_cat = f"{m.categoria} - {m.subcategoria}" if m.subcategoria else m.categoria
+            gastos_cat_sub[nome_cat] = gastos_cat_sub.get(nome_cat, 0) + m.valor
+            gastos_pagto[m.forma_pagto] = gastos_pagto.get(m.forma_pagto, 0) + m.valor
 
-    cores_grafico = [mapa_cores.get(cat, '#5F7254') for cat in gastos_cat.keys()]
+    cores_grafico_cat = [mapa_cores_cat.get(cat.split(' - ')[0], '#5F7254') for cat in gastos_cat_sub.keys()]
+    cores_grafico_pagto = [mapa_cores_pagto.get(pag, '#6c757d') for pag in gastos_pagto.keys()]
 
-    # --- LÓGICA DO GRÁFICO MENSAL (LINHAS E BARRAS) ---
     dt_atual = datetime.strptime(data_inicio, '%Y-%m-%d').date().replace(day=1)
     dt_fim_mes = data_fim_obj.replace(day=1)
 
@@ -143,11 +153,17 @@ def dashboard():
         dados_investimentos_mes.append(valores['Investimento'])
         dados_orcamento_mes.append(total_orcamento_mensal)
 
+    gastos_cat_limpos = {}
+    for m in movs_periodo:
+        if m.tipo_movimentacao == 'Saída':
+            gastos_cat_limpos[m.categoria] = gastos_cat_limpos.get(m.categoria, 0) + m.valor
+
     return render_template('dashboard.html', 
                            t_entrada=t_entrada_periodo, t_saida=t_saida_periodo, t_saida_futura=t_saida_futura,
-                           t_investimento=t_investimento_geral, caixa=caixa_atual,
-                           labels_cat=list(gastos_cat.keys()), valores_cat=list(gastos_cat.values()), cores_cat=cores_grafico,
-                           gastos_cat=gastos_cat, orcamentos=orcamentos,
+                           t_investimento=t_investimento_geral, caixa=caixa_atual, patrimonio_total=patrimonio_total,
+                           labels_cat=list(gastos_cat_sub.keys()), valores_cat=list(gastos_cat_sub.values()), cores_cat=cores_grafico_cat,
+                           labels_pagto=list(gastos_pagto.keys()), valores_pagto=list(gastos_pagto.values()), cores_pagto=cores_grafico_pagto,
+                           gastos_cat=gastos_cat_limpos, orcamentos=orcamentos,
                            labels_meses=labels_meses, dados_entradas_mes=dados_entradas_mes, 
                            dados_saidas_mes=dados_saidas_mes, dados_investimentos_mes=dados_investimentos_mes, 
                            dados_orcamento_mes=dados_orcamento_mes,
@@ -178,22 +194,36 @@ def lancamentos():
     hoje = datetime.today()
     data_inicio_str = request.args.get('data_inicio', hoje.replace(day=1).strftime('%Y-%m-%d'))
     data_fim_str = request.args.get('data_fim', hoje.replace(day=calendar.monthrange(hoje.year, hoje.month)[1]).strftime('%Y-%m-%d'))
+    
+    filtro_pagto = request.args.get('filtro_pagto', '')
+    filtro_cat = request.args.get('filtro_cat', '')
+    filtro_subcat = request.args.get('filtro_subcat', '')
 
     data_inicio_obj = datetime.strptime(data_inicio_str, '%Y-%m-%d').date()
     data_fim_obj = datetime.strptime(data_fim_str, '%Y-%m-%d').date()
 
     todas = Movimentacao.query.filter_by(usuario_id=current_user.id).all()
-    
     t_entrada_caixa = sum(m.valor for m in todas if m.tipo_movimentacao == 'Entrada' and m.data <= data_fim_obj)
     t_saida_caixa = sum(m.valor for m in todas if m.tipo_movimentacao == 'Saída' and m.data <= data_fim_obj)
     caixa_atual = t_entrada_caixa - t_saida_caixa
-    
     invest_geral = sum(m.valor for m in todas if m.tipo_movimentacao == 'Investimento')
     t_saida_futura = sum(m.valor for m in todas if m.tipo_movimentacao == 'Saída' and m.data > data_fim_obj)
+    
+    # NOVO: Patrimônio Total (Saldo da Conta + Investimentos)
+    patrimonio_total = caixa_atual + invest_geral
 
-    movs = Movimentacao.query.filter_by(usuario_id=current_user.id).filter(
+    query = Movimentacao.query.filter_by(usuario_id=current_user.id).filter(
         Movimentacao.data >= data_inicio_obj, Movimentacao.data <= data_fim_obj
-    ).order_by(Movimentacao.data.desc()).all()
+    )
+    
+    if filtro_pagto:
+        query = query.filter(Movimentacao.forma_pagto == filtro_pagto)
+    if filtro_cat:
+        query = query.filter(Movimentacao.categoria == filtro_cat)
+    if filtro_subcat:
+        query = query.filter(Movimentacao.subcategoria == filtro_subcat)
+
+    movs = query.order_by(Movimentacao.data.desc()).all()
 
     t_ent_per = sum(m.valor for m in movs if m.tipo_movimentacao == 'Entrada')
     t_sai_per = sum(m.valor for m in movs if m.tipo_movimentacao == 'Saída')
@@ -204,9 +234,19 @@ def lancamentos():
 
     return render_template('lancamentos.html', movimentacoes=movs, 
                            t_entrada=t_ent_per, t_saida=t_sai_per, t_saida_futura=t_saida_futura,
-                           t_investimento=invest_geral, caixa=caixa_atual,
+                           t_investimento=invest_geral, caixa=caixa_atual, patrimonio_total=patrimonio_total,
                            data_inicio=data_inicio_str, data_fim=data_fim_str,
+                           filtro_pagto=filtro_pagto, filtro_cat=filtro_cat, filtro_subcat=filtro_subcat,
                            formas=formas, categorias=categorias, subcategorias=subcategorias)
+
+@app.route('/excluir_mov_massa', methods=['POST'])
+@login_required
+def excluir_mov_massa():
+    ids_para_excluir = request.form.getlist('mov_ids')
+    if ids_para_excluir:
+        Movimentacao.query.filter(Movimentacao.id.in_(ids_para_excluir), Movimentacao.usuario_id == current_user.id).delete(synchronize_session=False)
+        db.session.commit()
+    return redirect(request.referrer or url_for('lancamentos'))
 
 @app.route('/editar_mov/<int:id>', methods=['GET', 'POST'])
 @login_required
