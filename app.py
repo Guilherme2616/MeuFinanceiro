@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, Usuario, Movimentacao, FormaPagamento, Categoria, Subcategoria, Orcamento
+from models import db, Usuario, Movimentacao, FormaPagamento, Categoria, Subcategoria, Orcamento, Investimento
 from datetime import datetime, date
 import calendar
 
@@ -94,8 +94,7 @@ def dashboard():
 
     t_investimento_geral = sum(m.valor for m in todas_movs if m.tipo_movimentacao == 'Investimento')
     t_saida_futura = sum(m.valor for m in todas_movs if m.tipo_movimentacao == 'Saída' and m.data > data_fim_obj)
-    
-    # NOVO: Patrimônio Total (Saldo da Conta + Investimentos)
+
     patrimonio_total = caixa_atual + t_investimento_geral
 
     movs_periodo = [m for m in todas_movs if datetime.strptime(data_inicio, '%Y-%m-%d').date() <= m.data <= data_fim_obj]
@@ -209,7 +208,6 @@ def lancamentos():
     invest_geral = sum(m.valor for m in todas if m.tipo_movimentacao == 'Investimento')
     t_saida_futura = sum(m.valor for m in todas if m.tipo_movimentacao == 'Saída' and m.data > data_fim_obj)
     
-    # NOVO: Patrimônio Total (Saldo da Conta + Investimentos)
     patrimonio_total = caixa_atual + invest_geral
 
     query = Movimentacao.query.filter_by(usuario_id=current_user.id).filter(
@@ -238,6 +236,96 @@ def lancamentos():
                            data_inicio=data_inicio_str, data_fim=data_fim_str,
                            filtro_pagto=filtro_pagto, filtro_cat=filtro_cat, filtro_subcat=filtro_subcat,
                            formas=formas, categorias=categorias, subcategorias=subcategorias)
+
+@app.route('/investimentos', methods=['GET', 'POST'])
+@login_required
+def investimentos():
+    if request.method == 'POST':
+        qtd_raw = float(request.form.get('quantidade').replace(',', '.'))
+        valor_raw = float(request.form.get('valor').replace('.', '').replace(',', '.'))
+        
+        novo_inv = Investimento(
+            operacao=request.form.get('operacao'),
+            categoria=request.form.get('categoria'),
+            subcategoria=request.form.get('subcategoria'),
+            ativo=request.form.get('ativo').upper(),
+            quantidade=qtd_raw,
+            valor=valor_raw,
+            data=datetime.strptime(request.form.get('data'), '%Y-%m-%d').date(),
+            usuario_id=current_user.id
+        )
+        db.session.add(novo_inv)
+        db.session.commit()
+        return redirect(request.referrer or url_for('investimentos'))
+
+    # Filtros de data
+    hoje = datetime.today()
+    data_inicio_str = request.args.get('data_inicio', hoje.replace(day=1).strftime('%Y-%m-%d'))
+    data_fim_str = request.args.get('data_fim', hoje.replace(day=calendar.monthrange(hoje.year, hoje.month)[1]).strftime('%Y-%m-%d'))
+    filtro_cat = request.args.get('filtro_cat', '')
+    filtro_subcat = request.args.get('filtro_subcat', '')
+
+    data_inicio_obj = datetime.strptime(data_inicio_str, '%Y-%m-%d').date()
+    data_fim_obj = datetime.strptime(data_fim_str, '%Y-%m-%d').date()
+
+    # Cálculos Globais (A vida toda da corretora)
+    todas_movs = Movimentacao.query.filter_by(usuario_id=current_user.id).all()
+    total_transferido = sum(m.valor for m in todas_movs if m.tipo_movimentacao == 'Investimento')
+
+    todos_invs = Investimento.query.filter_by(usuario_id=current_user.id).all()
+    total_compras = sum((i.quantidade * i.valor) for i in todos_invs if i.operacao == 'Compra')
+    total_vendas = sum((i.quantidade * i.valor) for i in todos_invs if i.operacao == 'Venda')
+    total_recebimentos = sum((i.quantidade * i.valor) for i in todos_invs if i.operacao == 'Recebimento')
+    
+    valor_investido = total_compras - total_vendas
+    saldo_corretora = total_transferido - total_compras + total_vendas + total_recebimentos
+
+    # Query Filtrada para a Tabela
+    query = Investimento.query.filter_by(usuario_id=current_user.id).filter(
+        Investimento.data >= data_inicio_obj, Investimento.data <= data_fim_obj
+    )
+    if filtro_cat:
+        query = query.filter(Investimento.categoria == filtro_cat)
+    if filtro_subcat:
+        query = query.filter(Investimento.subcategoria == filtro_subcat)
+
+    invs_filtrados = query.order_by(Investimento.data.desc()).all()
+
+    return render_template('investimentos.html', investimentos=invs_filtrados, 
+                           total_transferido=total_transferido, 
+                           valor_investido=valor_investido, 
+                           saldo_corretora=saldo_corretora,
+                           data_inicio=data_inicio_str, data_fim=data_fim_str,
+                           filtro_cat=filtro_cat, filtro_subcat=filtro_subcat)
+
+@app.route('/editar_investimento/<int:id>', methods=['GET', 'POST'])
+@login_required
+def editar_investimento(id):
+    inv = Investimento.query.get_or_404(id)
+    if inv.usuario_id != current_user.id:
+        return redirect(url_for('investimentos'))
+    
+    if request.method == 'POST':
+        inv.operacao = request.form.get('operacao')
+        inv.categoria = request.form.get('categoria')
+        inv.subcategoria = request.form.get('subcategoria')
+        inv.ativo = request.form.get('ativo').upper()
+        inv.quantidade = float(request.form.get('quantidade').replace(',', '.'))
+        inv.valor = float(request.form.get('valor').replace('.', '').replace(',', '.'))
+        inv.data = datetime.strptime(request.form.get('data'), '%Y-%m-%d').date()
+        db.session.commit()
+        return redirect(url_for('investimentos'))
+
+    return render_template('editar_investimento.html', inv=inv)
+
+@app.route('/excluir_investimento/<int:id>')
+@login_required
+def excluir_investimento(id):
+    inv = Investimento.query.get_or_404(id)
+    if inv.usuario_id == current_user.id:
+        db.session.delete(inv)
+        db.session.commit()
+    return redirect(request.referrer or url_for('investimentos'))
 
 @app.route('/excluir_mov_massa', methods=['POST'])
 @login_required
@@ -334,6 +422,26 @@ def excluir_categoria(id):
         Subcategoria.query.filter_by(categoria_id=cat.id).delete()
         db.session.delete(cat)
         db.session.commit()
+    return redirect(url_for('gerenciar_categorias'))
+
+@app.route('/excluir_subcategoria/<int:id>')
+@login_required
+def excluir_subcategoria(id):
+    sub = Subcategoria.query.get_or_404(id)
+    if sub.usuario_id == current_user.id:
+        db.session.delete(sub)
+        db.session.commit()
+    return redirect(url_for('gerenciar_categorias'))
+
+@app.route('/editar_subcategoria/<int:id>', methods=['POST'])
+@login_required
+def editar_subcategoria(id):
+    sub = Subcategoria.query.get_or_404(id)
+    if sub.usuario_id == current_user.id:
+        novo_nome = request.form.get('novo_nome')
+        if novo_nome:
+            sub.nome = novo_nome
+            db.session.commit()
     return redirect(url_for('gerenciar_categorias'))
 
 @app.route('/excluir_mov/<int:id>')

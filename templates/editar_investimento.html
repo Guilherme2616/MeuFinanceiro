@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Investimento</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #FDFDE5; font-family: 'Raleway', sans-serif; }
+        .card-custom { border-radius: 16px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body class="p-5">
+
+<div class="container" style="max-width: 800px;">
+    <a href="{{ url_for('investimentos') }}" class="btn btn-outline-dark rounded-pill fw-bold mb-4">Cancelar Edição</a>
+    
+    <div class="card card-custom bg-white p-5">
+        <h4 class="fw-bold mb-4" style="color: #5F7254;">Editando: {{ inv.ativo }}</h4>
+        
+        <form class="row g-3" method="POST" autocomplete="off">
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Operação</label>
+                <select name="operacao" class="form-select">
+                    <option value="Compra" {% if inv.operacao == 'Compra' %}selected{% endif %}>🔴 Compra</option>
+                    <option value="Venda" {% if inv.operacao == 'Venda' %}selected{% endif %}>🟢 Venda</option>
+                    <option value="Recebimento" {% if inv.operacao == 'Recebimento' %}selected{% endif %}>🔵 Recebimento</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Categoria</label>
+                <select name="categoria" class="form-select" id="form_cat" required>
+                    <option value="Renda Fixa" {% if inv.categoria == 'Renda Fixa' %}selected{% endif %}>Renda Fixa</option>
+                    <option value="Renda Variável" {% if inv.categoria == 'Renda Variável' %}selected{% endif %}>Renda Variável</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Subcategoria</label>
+                <select name="subcategoria" class="form-select" id="form_subcat" required>
+                    </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Ativo</label>
+                <input type="text" name="ativo" class="form-control text-uppercase" value="{{ inv.ativo }}" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Quantidade</label>
+                <input type="number" step="any" name="quantidade" class="form-control" value="{{ inv.quantidade }}" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Valor Unitário (R$)</label>
+                <input type="text" name="valor" class="form-control" value="{{ inv.valor|formato_moeda }}" required>
+            </div>
+            <div class="col-md-4 mt-3">
+                <label class="form-label fw-bold">Data</label>
+                <input type="date" name="data" class="form-control" value="{{ inv.data.strftime('%Y-%m-%d') }}" required>
+            </div>
+            
+            <div class="col-12 mt-4">
+                <button type="submit" class="btn w-100 fw-bold py-2" style="background-color: #5F7254; color: white;">Salvar Alterações</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const invSubMap = {
+        "Renda Fixa": ["Tesouro Direto", "CDB", "LCI / LCA", "Poupança", "Debêntures", "Fundos de Renda Fixa"],
+        "Renda Variável": ["Ações", "Fundos Imobiliários (FII)", "ETFs", "BDRs", "Criptomoedas", "Previdência"]
+    };
+
+    const formCat = document.getElementById('form_cat');
+    const formSubcat = document.getElementById('form_subcat');
+    const subAtual = "{{ inv.subcategoria }}";
+
+    formCat.addEventListener('change', function() {
+        const cat = this.value;
+        formSubcat.innerHTML = '';
+        if (invSubMap[cat]) {
+            invSubMap[cat].forEach(sub => {
+                const selected = (sub === subAtual) ? 'selected' : '';
+                formSubcat.innerHTML += `<option value="${sub}" ${selected}>${sub}</option>`;
+            });
+        }
+    });
+    
+    // Dispara para carregar a lista inicial
+    formCat.dispatchEvent(new Event('change'));
+</script>
+</body>
+</html>

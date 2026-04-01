@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Investimentos - Meu Financeiro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        :root { --cor-fundo: #FDFDE5; --cor-sidebar: #5F7254; --cor-botao: #783E19; --cor-botao-hover: #5c2e11; }
+        body { background-color: var(--cor-fundo); color: #333; font-family: 'Raleway', sans-serif; }
+        .sidebar { background-color: var(--cor-sidebar); color: white; min-height: 100vh; padding: 20px; }
+        .nav-link { color: rgba(255,255,255,0.8); font-weight: 600; }
+        .nav-link:hover, .nav-link.active { color: white; background-color: rgba(255,255,255,0.1); border-radius: 8px; }
+        .card-custom { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .btn-salvar { background-color: var(--cor-botao); color: white; font-weight: 700; border: none; }
+        .btn-salvar:hover { background-color: var(--cor-botao-hover); color: white; }
+        .btn-logout { position: absolute; top: 20px; right: 20px; border-color: #dc3545; color: #dc3545; }
+        .btn-logout:hover { background-color: #dc3545; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <nav class="col-md-2 d-none d-md-block sidebar shadow-lg">
+            <h3 class="text-center mb-5 mt-3 fw-bold"><i class="bi bi-leaf me-2"></i>Meu Financeiro</h3>
+            <ul class="nav flex-column gap-2">
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}"><i class="bi bi-pie-chart-fill me-2"></i> Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('lancamentos') }}"><i class="bi bi-card-list me-2"></i> Lançamentos</a></li>
+                <li class="nav-item"><a class="nav-link active" href="{{ url_for('investimentos') }}"><i class="bi bi-graph-up-arrow me-2"></i> Investimentos</a></li>
+                
+                <li class="nav-item mt-2 border-top pt-2 border-secondary">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#cadastrosMenu" role="button" aria-expanded="false">
+                        <i class="bi bi-folder-fill me-2"></i> Cadastros <i class="bi bi-chevron-down float-end mt-1" style="font-size: 0.8rem;"></i>
+                    </a>
+                    <div class="collapse" id="cadastrosMenu">
+                        <ul class="nav flex-column ms-3 mt-1 gap-1">
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('gerenciar_categorias') }}" style="font-size: 0.9rem;"><i class="bi bi-tags-fill me-2"></i> Categorias</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('orcamentos') }}" style="font-size: 0.9rem;"><i class="bi bi-bullseye me-2"></i> Orçamentos</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('gerenciar_formas') }}" style="font-size: 0.9rem;"><i class="bi bi-credit-card-fill me-2"></i> Pagamentos</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+
+        <main class="col-md-10 ms-sm-auto px-md-5 position-relative">
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-sm btn-logout fw-bold rounded-pill px-4">Sair</a>
+            <div class="pt-4 pb-2 mb-4 border-bottom border-dark-subtle mt-3"><h2 class="fw-bold">Minha Corretora</h2></div>
+
+            <div class="card card-custom p-3 mb-4 bg-white">
+                <form method="GET" action="{{ url_for('investimentos') }}" class="row g-3 align-items-end" autocomplete="off" id="formFiltrosInv">
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold text-muted">A partir de:</label>
+                        <input type="date" name="data_inicio" class="form-control" value="{{ data_inicio }}">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold text-muted">Até:</label>
+                        <input type="date" name="data_fim" class="form-control" value="{{ data_fim }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold text-muted">Categoria:</label>
+                        <select name="filtro_cat" class="form-select" id="filtro_cat">
+                            <option value="">Todas</option>
+                            <option value="Renda Fixa" {% if filtro_cat == 'Renda Fixa' %}selected{% endif %}>Renda Fixa</option>
+                            <option value="Renda Variável" {% if filtro_cat == 'Renda Variável' %}selected{% endif %}>Renda Variável</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold text-muted">Subcategoria:</label>
+                        <select name="filtro_subcat" class="form-select" id="filtro_subcat">
+                            <option value="">Todas</option>
+                        </select>
+                    </div>
+                    <div class="col-md-1"><button type="submit" class="btn btn-salvar w-100 shadow-sm" title="Filtrar"><i class="bi bi-funnel-fill"></i></button></div>
+                    <div class="col-md-1"><a href="{{ url_for('investimentos') }}" class="btn btn-outline-secondary w-100" title="Limpar"><i class="bi bi-eraser-fill"></i></a></div>
+                </form>
+            </div>
+
+            <div class="row g-3 mb-4 justify-content-center">
+                <div class="col-md-4">
+                    <div class="card card-custom p-4 bg-white border-start border-secondary border-5 text-center">
+                        <h6 class="text-secondary fw-bold small">TOTAL PARA INVESTIR</h6>
+                        <h2 class="fw-bold text-dark mb-0">R$ {{ total_transferido|formato_moeda }}</h2>
+                        <small class="text-muted d-block mt-2">Valor transferido da Conta Corrente</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-custom p-4 bg-white border-start border-info border-5 text-center">
+                        <h6 class="text-info fw-bold small">VALOR INVESTIDO (ATIVOS)</h6>
+                        <h2 class="fw-bold text-dark mb-0">R$ {{ valor_investido|formato_moeda }}</h2>
+                        <small class="text-muted d-block mt-2">Dinheiro alocado em patrimônio</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-custom p-4 text-white shadow text-center" style="background-color: var(--cor-sidebar);">
+                        <h6 class="fw-bold opacity-75 small">SALDO DISPONÍVEL NA CORRETORA</h6>
+                        <h2 class="fw-bold mb-0">R$ {{ saldo_corretora|formato_moeda }}</h2>
+                        <small class="opacity-75 d-block mt-2">Dinheiro livre para fazer novas compras</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card card-custom p-4 mb-4 bg-white border border-secondary border-opacity-25">
+                <h5 class="mb-3 fw-bold" style="color: var(--cor-sidebar);"><i class="bi bi-briefcase-fill me-2"></i>Nova Operação</h5>
+                <form class="row g-3" method="POST" autocomplete="off">
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold text-muted">Operação</label>
+                        <select name="operacao" class="form-select border-2">
+                            <option value="Compra">🔴 Compra (-)</option>
+                            <option value="Venda">🟢 Venda (+)</option>
+                            <option value="Recebimento">🔵 Recebimento/Div (+)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold text-muted">Categoria</label>
+                        <select name="categoria" class="form-select" id="form_cat" required>
+                            <option value="" disabled selected>Selecione...</option>
+                            <option value="Renda Fixa">Renda Fixa</option>
+                            <option value="Renda Variável">Renda Variável</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold text-muted">Subcategoria</label>
+                        <select name="subcategoria" class="form-select" id="form_subcat" required>
+                            <option value="" disabled selected>Selecione a categoria</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold text-muted">Nome do Ativo</label>
+                        <input type="text" name="ativo" class="form-control text-uppercase" placeholder="Ex: PETR4, Selic" required>
+                    </div>
+                    <div class="col-md-1">
+                        <label class="form-label small fw-bold text-muted">Qtd</label>
+                        <input type="number" step="any" name="quantidade" class="form-control" placeholder="1" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold text-muted">Valor Unit. (R$)</label>
+                        <input type="text" name="valor" class="form-control" placeholder="0,00" required>
+                    </div>
+                    <div class="col-md-1">
+                        <label class="form-label small fw-bold text-muted">Data</label>
+                        <input type="date" name="data" class="form-control" required>
+                    </div>
+                    <div class="col-md-12 d-flex justify-content-end mt-2">
+                        <button type="submit" class="btn btn-salvar px-5 py-2 shadow-sm rounded-pill">Registrar Operação</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-responsive bg-white rounded-4 shadow-sm p-4 mb-5">
+                <h5 class="fw-bold mb-3" style="color: var(--cor-sidebar);">Histórico de Operações</h5>
+                <table class="table table-borderless align-middle">
+                    <thead class="border-bottom">
+                        <tr class="text-muted small">
+                            <th>DATA</th><th>OPERAÇÃO</th><th>CATEGORIA</th><th>ATIVO</th><th>QTD</th><th>VAL. UNIT.</th><th>TOTAL</th><th class="text-center">AÇÕES</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inv in investimentos %}
+                        <tr class="border-bottom">
+                            <td class="small text-secondary fw-bold">{{ inv.data.strftime('%d/%m/%Y') }}</td>
+                            <td>
+                                {% if inv.operacao == 'Compra' %}<span class="badge bg-danger">Compra</span>
+                                {% elif inv.operacao == 'Venda' %}<span class="badge bg-success">Venda</span>
+                                {% else %}<span class="badge bg-info text-dark">Recebimento</span>{% endif %}
+                            </td>
+                            <td>
+                                <span class="fw-bold">{{ inv.categoria }}</span>
+                                <small class="text-muted d-block">{{ inv.subcategoria }}</small>
+                            </td>
+                            <td class="fw-bold text-primary">{{ inv.ativo }}</td>
+                            <td>{{ inv.quantidade }}</td>
+                            <td>R$ {{ inv.valor|formato_moeda }}</td>
+                            <td class="fw-bold">R$ {{ (inv.quantidade * inv.valor)|formato_moeda }}</td>
+                            <td class="text-center">
+                                <a href="{{ url_for('editar_investimento', id=inv.id) }}" class="btn btn-sm btn-outline-primary border-0 rounded-circle me-1" title="Editar"><i class="bi bi-pencil-fill"></i></a>
+                                <a href="{{ url_for('excluir_investimento', id=inv.id) }}" class="btn btn-sm btn-outline-danger border-0 rounded-circle btn-excluir" title="Excluir"><i class="bi bi-trash3-fill"></i></a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="8" class="text-center text-muted py-4">Nenhuma operação encontrada para este período.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    // Dicionário de Investimentos
+    const invSubMap = {
+        "Renda Fixa": ["Tesouro Direto", "CDB", "LCI / LCA", "Poupança", "Debêntures", "Fundos de Renda Fixa"],
+        "Renda Variável": ["Ações", "Fundos Imobiliários (FII)", "ETFs", "BDRs", "Criptomoedas", "Previdência"]
+    };
+
+    // Lógica Formulário Principal
+    const formCat = document.getElementById('form_cat');
+    const formSubcat = document.getElementById('form_subcat');
+
+    formCat.addEventListener('change', function() {
+        const cat = this.value;
+        formSubcat.innerHTML = '<option value="" disabled selected>Selecione...</option>';
+        if (invSubMap[cat]) {
+            invSubMap[cat].forEach(sub => {
+                formSubcat.innerHTML += `<option value="${sub}">${sub}</option>`;
+            });
+        }
+    });
+
+    // Lógica Filtros
+    const filtroCat = document.getElementById('filtro_cat');
+    const filtroSubcat = document.getElementById('filtro_subcat');
+    const subAtual = "{{ filtro_subcat }}";
+
+    filtroCat.addEventListener('change', function() {
+        const cat = this.value;
+        filtroSubcat.innerHTML = '<option value="">Todas</option>';
+        if (invSubMap[cat]) {
+            invSubMap[cat].forEach(sub => {
+                const selected = (sub === subAtual) ? 'selected' : '';
+                filtroSubcat.innerHTML += `<option value="${sub}" ${selected}>${sub}</option>`;
+            });
+        }
+    });
+    if (filtroCat.value) { filtroCat.dispatchEvent(new Event('change')); }
+
+    // SweetAlert para Exclusão
+    document.querySelectorAll('.btn-excluir').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault(); 
+            const url = this.getAttribute('href');
+            Swal.fire({ title: 'Tem certeza?', text: "Excluir esta operação afetará seu saldo investido!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc3545', cancelButtonColor: '#6c757d', confirmButtonText: 'Sim, excluir!', cancelButtonText: 'Cancelar'
+            }).then((result) => { if (result.isConfirmed) { window.location.href = url; } });
+        });
+    });
+</script>
+</body>
+</html>

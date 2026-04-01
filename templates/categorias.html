@@ -99,7 +99,13 @@
                 </div>
                 <ul class="list-unstyled ms-4 mt-2 mb-0 small text-muted fw-bold">
                     {% for sub in cat.subcategorias %}
-                    <li><i class="bi bi-arrow-return-right me-1"></i> {{ sub.nome }}</li>
+                    <li class="d-flex justify-content-between align-items-center mb-1">
+                        <span><i class="bi bi-arrow-return-right me-1"></i> {{ sub.nome }}</span>
+                        <div>
+                            <button type="button" class="btn btn-sm text-primary p-0 me-2" onclick="editarSubcategoria({{ sub.id }}, '{{ sub.nome }}')" title="Editar Subcategoria"><i class="bi bi-pencil-fill"></i></button>
+                            <a href="{{ url_for('excluir_subcategoria', id=sub.id) }}" class="text-danger p-0" onclick="return confirm('Excluir esta subcategoria?')" title="Excluir Subcategoria"><i class="bi bi-trash-fill"></i></a>
+                        </div>
+                    </li>
                     {% else %}
                     <li><i class="opacity-50">Nenhuma subcategoria</i></li>
                     {% endfor %}
@@ -110,5 +116,31 @@
     </div>
 </div>
 
+<form id="formEditSub" method="POST" style="display: none;">
+    <input type="hidden" name="novo_nome" id="inputNovoNomeSub">
+</form>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function editarSubcategoria(id, nomeAtual) {
+        Swal.fire({
+            title: 'Editar Subcategoria',
+            input: 'text',
+            inputValue: nomeAtual,
+            showCancelButton: true,
+            confirmButtonText: 'Salvar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#5F7254'
+        }).then((result) => {
+            if (result.isConfirmed && result.value) {
+                const form = document.getElementById('formEditSub');
+                form.action = '/editar_subcategoria/' + id;
+                document.getElementById('inputNovoNomeSub').value = result.value;
+                form.submit();
+            }
+        });
+    }
+</script>
 </body>
 </html>

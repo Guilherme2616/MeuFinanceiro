@@ -16,6 +16,19 @@ class Usuario(db.Model, UserMixin):
     categorias = db.relationship('Categoria', backref='dono_categoria', lazy=True)
     subcategorias = db.relationship('Subcategoria', backref='dono_sub', lazy=True)
     orcamentos = db.relationship('Orcamento', backref='dono_orc', lazy=True)
+    investimentos = db.relationship('Investimento', backref='dono_inv', lazy=True)
+
+class Investimento(db.Model):
+    __tablename__ = 'investimento'
+    id = db.Column(db.Integer, primary_key=True)
+    operacao = db.Column(db.String(20), nullable=False) # Compra, Venda, Recebimento
+    categoria = db.Column(db.String(50), nullable=False) # Renda Fixa ou Renda Variável
+    subcategoria = db.Column(db.String(50), nullable=False) # CDB, Ações, etc.
+    ativo = db.Column(db.String(50), nullable=False)    # PETR4, Selic...
+    quantidade = db.Column(db.Float, nullable=False)
+    valor = db.Column(db.Float, nullable=False)         # Valor Unitário
+    data = db.Column(db.Date, nullable=False)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
 
 class Orcamento(db.Model):
     __tablename__ = 'orcamento'
@@ -28,7 +41,7 @@ class Categoria(db.Model):
     __tablename__ = 'categoria'
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(50), nullable=False)
-    icone = db.Column(db.String(50), nullable=False)
+    icone = db.Column(db.String(255), nullable=False)
     cor = db.Column(db.String(20), nullable=False, default='#5F7254')
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     subcategorias = db.relationship('Subcategoria', backref='categoria_pai', lazy=True)
@@ -44,8 +57,8 @@ class FormaPagamento(db.Model):
     __tablename__ = 'forma_pagamento'
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(50), nullable=False)
-    icone = db.Column(db.String(50), nullable=False)
-    cor = db.Column(db.String(20), nullable=False, default='#6c757d') # NOVA COLUNA DE COR
+    icone = db.Column(db.String(255), nullable=False) 
+    cor = db.Column(db.String(20), nullable=False, default='#6c757d')
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
 
 class Movimentacao(db.Model):
