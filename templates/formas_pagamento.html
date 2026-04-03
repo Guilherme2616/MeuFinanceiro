@@ -38,6 +38,7 @@
                             <div class="col-9"><label class="form-label fw-bold">Nome da Forma</label><input type="text" name="nome" class="form-control" placeholder="Ex: Cartão Nubank, VR..." required></div>
                             <div class="col-3"><label class="form-label fw-bold">Cor Fundo</label><input type="color" name="cor" class="form-control form-control-color w-100" value="#20c997" title="Escolha a cor"></div>
                         </div>
+
                         <label class="form-label fw-bold mt-2">Escolha um Ícone</label>
                         <div class="icon-selector mb-4">
                             <input type="radio" id="ic1" name="icone" value="bi-credit-card" checked><label for="ic1"><i class="bi bi-credit-card"></i></label>
@@ -62,7 +63,9 @@
         <div class="col-md-4">
             <div class="card card-custom bg-white p-3 border-top border-5" style="border-color: {{ f.cor }} !important;">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="fw-bold m-0 text-dark d-flex align-items-center"><i class="bi {{ f.icone }} me-2" style="color: {{ f.cor }};"></i>{{ f.nome }}</h5>
+                    <div>
+                        <h5 class="fw-bold m-0 text-dark d-flex align-items-center"><i class="bi {{ f.icone }} me-2" style="color: {{ f.cor }};"></i>{{ f.nome }}</h5>
+                    </div>
                     <a href="{{ url_for('excluir_forma', id=f.id) }}" class="text-danger" onclick="return confirm('Excluir esta forma de pagamento?')"><i class="bi bi-trash-fill"></i></a>
                 </div>
             </div>

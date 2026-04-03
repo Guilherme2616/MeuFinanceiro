@@ -64,8 +64,9 @@ def login():
             login_user(user)
             
             if not FormaPagamento.query.filter_by(usuario_id=user.id).first():
-                for nome, icone, cor in [('Pix', 'bi-phone', '#20c997'), ('Dinheiro', 'bi-cash-stack', '#198754'), ('Cartão de Crédito', 'bi-credit-card', '#ffc107')]:
-                    db.session.add(FormaPagamento(nome=nome, icone=icone, cor=cor, usuario_id=user.id))
+                db.session.add(FormaPagamento(nome='Pix', icone='bi-phone', cor='#20c997', usuario_id=user.id))
+                db.session.add(FormaPagamento(nome='Dinheiro', icone='bi-cash-stack', cor='#198754', usuario_id=user.id))
+                db.session.add(FormaPagamento(nome='Cartão de Crédito', icone='bi-credit-card', cor='#ffc107', usuario_id=user.id))
             
             if not Categoria.query.filter_by(usuario_id=user.id).first():
                 cats = [('Moradia', 'bi-house-door', '#5F7254'), ('Alimentação', 'bi-cart', '#783E19'), ('Transporte', 'bi-car-front', '#8E8D8A'), ('Salário', 'bi-cash-coin', '#198754'), ('Investimentos', 'bi-graph-up-arrow', '#0dcaf0')]
@@ -178,8 +179,9 @@ def lancamentos():
         data_base = datetime.strptime(request.form.get('data'), '%Y-%m-%d').date()
 
         for i in range(parcelas):
-            data_lanc = adicionar_meses(data_base, i)
+            data_lanc = adicionar_meses(data_base, i) 
             desc = f"{request.form.get('descricao')} ({i+1}/{parcelas})" if parcelas > 1 else request.form.get('descricao')
+            
             nova = Movimentacao(
                 descricao=desc, valor=valor_parcela,
                 forma_pagto=request.form.get('forma_pagto'), categoria=request.form.get('categoria'),
@@ -206,20 +208,17 @@ def lancamentos():
     t_saida_caixa = sum(m.valor for m in todas if m.tipo_movimentacao == 'Saída' and m.data <= data_fim_obj)
     caixa_atual = t_entrada_caixa - t_saida_caixa
     invest_geral = sum(m.valor for m in todas if m.tipo_movimentacao == 'Investimento')
-    t_saida_futura = sum(m.valor for m in todas if m.tipo_movimentacao == 'Saída' and m.data > data_fim_obj)
     
+    t_saida_futura = sum(m.valor for m in todas if m.tipo_movimentacao == 'Saída' and m.data > data_fim_obj)
     patrimonio_total = caixa_atual + invest_geral
 
     query = Movimentacao.query.filter_by(usuario_id=current_user.id).filter(
         Movimentacao.data >= data_inicio_obj, Movimentacao.data <= data_fim_obj
     )
     
-    if filtro_pagto:
-        query = query.filter(Movimentacao.forma_pagto == filtro_pagto)
-    if filtro_cat:
-        query = query.filter(Movimentacao.categoria == filtro_cat)
-    if filtro_subcat:
-        query = query.filter(Movimentacao.subcategoria == filtro_subcat)
+    if filtro_pagto: query = query.filter(Movimentacao.forma_pagto == filtro_pagto)
+    if filtro_cat: query = query.filter(Movimentacao.categoria == filtro_cat)
+    if filtro_subcat: query = query.filter(Movimentacao.subcategoria == filtro_subcat)
 
     movs = query.order_by(Movimentacao.data.desc()).all()
 
@@ -243,68 +242,41 @@ def investimentos():
     if request.method == 'POST':
         qtd_raw = float(request.form.get('quantidade').replace(',', '.'))
         valor_raw = float(request.form.get('valor').replace('.', '').replace(',', '.'))
-        
-        novo_inv = Investimento(
-            operacao=request.form.get('operacao'),
-            categoria=request.form.get('categoria'),
-            subcategoria=request.form.get('subcategoria'),
-            ativo=request.form.get('ativo').upper(),
-            quantidade=qtd_raw,
-            valor=valor_raw,
-            data=datetime.strptime(request.form.get('data'), '%Y-%m-%d').date(),
-            usuario_id=current_user.id
-        )
+        novo_inv = Investimento(operacao=request.form.get('operacao'),categoria=request.form.get('categoria'),subcategoria=request.form.get('subcategoria'),ativo=request.form.get('ativo').upper(),quantidade=qtd_raw,valor=valor_raw,data=datetime.strptime(request.form.get('data'), '%Y-%m-%d').date(),usuario_id=current_user.id)
         db.session.add(novo_inv)
         db.session.commit()
         return redirect(request.referrer or url_for('investimentos'))
-
-    # Filtros de data
+    
     hoje = datetime.today()
     data_inicio_str = request.args.get('data_inicio', hoje.replace(day=1).strftime('%Y-%m-%d'))
     data_fim_str = request.args.get('data_fim', hoje.replace(day=calendar.monthrange(hoje.year, hoje.month)[1]).strftime('%Y-%m-%d'))
     filtro_cat = request.args.get('filtro_cat', '')
     filtro_subcat = request.args.get('filtro_subcat', '')
-
+    
     data_inicio_obj = datetime.strptime(data_inicio_str, '%Y-%m-%d').date()
     data_fim_obj = datetime.strptime(data_fim_str, '%Y-%m-%d').date()
-
-    # Cálculos Globais (A vida toda da corretora)
+    
     todas_movs = Movimentacao.query.filter_by(usuario_id=current_user.id).all()
     total_transferido = sum(m.valor for m in todas_movs if m.tipo_movimentacao == 'Investimento')
-
     todos_invs = Investimento.query.filter_by(usuario_id=current_user.id).all()
     total_compras = sum((i.quantidade * i.valor) for i in todos_invs if i.operacao == 'Compra')
     total_vendas = sum((i.quantidade * i.valor) for i in todos_invs if i.operacao == 'Venda')
     total_recebimentos = sum((i.quantidade * i.valor) for i in todos_invs if i.operacao == 'Recebimento')
-    
     valor_investido = total_compras - total_vendas
     saldo_corretora = total_transferido - total_compras + total_vendas + total_recebimentos
-
-    # Query Filtrada para a Tabela
-    query = Investimento.query.filter_by(usuario_id=current_user.id).filter(
-        Investimento.data >= data_inicio_obj, Investimento.data <= data_fim_obj
-    )
-    if filtro_cat:
-        query = query.filter(Investimento.categoria == filtro_cat)
-    if filtro_subcat:
-        query = query.filter(Investimento.subcategoria == filtro_subcat)
-
+    
+    query = Investimento.query.filter_by(usuario_id=current_user.id).filter(Investimento.data >= data_inicio_obj, Investimento.data <= data_fim_obj)
+    if filtro_cat: query = query.filter(Investimento.categoria == filtro_cat)
+    if filtro_subcat: query = query.filter(Investimento.subcategoria == filtro_subcat)
     invs_filtrados = query.order_by(Investimento.data.desc()).all()
-
-    return render_template('investimentos.html', investimentos=invs_filtrados, 
-                           total_transferido=total_transferido, 
-                           valor_investido=valor_investido, 
-                           saldo_corretora=saldo_corretora,
-                           data_inicio=data_inicio_str, data_fim=data_fim_str,
-                           filtro_cat=filtro_cat, filtro_subcat=filtro_subcat)
+    
+    return render_template('investimentos.html', investimentos=invs_filtrados, total_transferido=total_transferido, valor_investido=valor_investido, saldo_corretora=saldo_corretora,data_inicio=data_inicio_str, data_fim=data_fim_str,filtro_cat=filtro_cat, filtro_subcat=filtro_subcat)
 
 @app.route('/editar_investimento/<int:id>', methods=['GET', 'POST'])
 @login_required
 def editar_investimento(id):
     inv = Investimento.query.get_or_404(id)
-    if inv.usuario_id != current_user.id:
-        return redirect(url_for('investimentos'))
-    
+    if inv.usuario_id != current_user.id: return redirect(url_for('investimentos'))
     if request.method == 'POST':
         inv.operacao = request.form.get('operacao')
         inv.categoria = request.form.get('categoria')
@@ -315,7 +287,6 @@ def editar_investimento(id):
         inv.data = datetime.strptime(request.form.get('data'), '%Y-%m-%d').date()
         db.session.commit()
         return redirect(url_for('investimentos'))
-
     return render_template('editar_investimento.html', inv=inv)
 
 @app.route('/excluir_investimento/<int:id>')
@@ -340,9 +311,7 @@ def excluir_mov_massa():
 @login_required
 def editar_mov(id):
     mov = Movimentacao.query.get_or_404(id)
-    if mov.usuario_id != current_user.id:
-        return redirect(url_for('lancamentos'))
-    
+    if mov.usuario_id != current_user.id: return redirect(url_for('lancamentos'))
     if request.method == 'POST':
         mov.valor = float(request.form.get('valor').replace('.', '').replace(',', '.'))
         mov.descricao = request.form.get('descricao')
@@ -353,11 +322,16 @@ def editar_mov(id):
         mov.data = datetime.strptime(request.form.get('data'), '%Y-%m-%d').date()
         db.session.commit()
         return redirect(url_for('lancamentos'))
+    return render_template('editar_lancamento.html', mov=mov, formas=FormaPagamento.query.filter_by(usuario_id=current_user.id).all(), categorias=Categoria.query.filter_by(usuario_id=current_user.id).all(), subcategorias=Subcategoria.query.filter_by(usuario_id=current_user.id).all())
 
-    return render_template('editar_lancamento.html', mov=mov, 
-                           formas=FormaPagamento.query.filter_by(usuario_id=current_user.id).all(), 
-                           categorias=Categoria.query.filter_by(usuario_id=current_user.id).all(), 
-                           subcategorias=Subcategoria.query.filter_by(usuario_id=current_user.id).all())
+@app.route('/excluir_mov/<int:id>')
+@login_required
+def excluir_mov(id):
+    mov = Movimentacao.query.get_or_404(id)
+    if mov.usuario_id == current_user.id:
+        db.session.delete(mov)
+        db.session.commit()
+    return redirect(request.referrer or url_for('lancamentos'))
 
 @app.route('/orcamentos', methods=['GET', 'POST'])
 @login_required
@@ -366,10 +340,8 @@ def orcamentos():
         categoria = request.form.get('categoria')
         valor_raw = request.form.get('valor_limite').replace('.', '').replace(',', '.')
         orc = Orcamento.query.filter_by(usuario_id=current_user.id, categoria=categoria).first()
-        if orc:
-            orc.valor_limite = float(valor_raw)
-        else:
-            db.session.add(Orcamento(categoria=categoria, valor_limite=float(valor_raw), usuario_id=current_user.id))
+        if orc: orc.valor_limite = float(valor_raw)
+        else: db.session.add(Orcamento(categoria=categoria, valor_limite=float(valor_raw), usuario_id=current_user.id))
         db.session.commit()
         return redirect(url_for('orcamentos'))
     return render_template('orcamentos.html', orcamentos=Orcamento.query.filter_by(usuario_id=current_user.id).all(), categorias=Categoria.query.filter_by(usuario_id=current_user.id).all())
@@ -443,15 +415,6 @@ def editar_subcategoria(id):
             sub.nome = novo_nome
             db.session.commit()
     return redirect(url_for('gerenciar_categorias'))
-
-@app.route('/excluir_mov/<int:id>')
-@login_required
-def excluir_mov(id):
-    mov = Movimentacao.query.get_or_404(id)
-    if mov.usuario_id == current_user.id:
-        db.session.delete(mov)
-        db.session.commit()
-    return redirect(request.referrer or url_for('lancamentos'))
 
 @app.route('/logout')
 def logout():

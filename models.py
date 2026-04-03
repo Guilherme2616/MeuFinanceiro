@@ -21,12 +21,12 @@ class Usuario(db.Model, UserMixin):
 class Investimento(db.Model):
     __tablename__ = 'investimento'
     id = db.Column(db.Integer, primary_key=True)
-    operacao = db.Column(db.String(20), nullable=False) # Compra, Venda, Recebimento
-    categoria = db.Column(db.String(50), nullable=False) # Renda Fixa ou Renda Variável
-    subcategoria = db.Column(db.String(50), nullable=False) # CDB, Ações, etc.
-    ativo = db.Column(db.String(50), nullable=False)    # PETR4, Selic...
+    operacao = db.Column(db.String(20), nullable=False) 
+    categoria = db.Column(db.String(50), nullable=False) 
+    subcategoria = db.Column(db.String(50), nullable=False) 
+    ativo = db.Column(db.String(50), nullable=False)    
     quantidade = db.Column(db.Float, nullable=False)
-    valor = db.Column(db.Float, nullable=False)         # Valor Unitário
+    valor = db.Column(db.Float, nullable=False)         
     data = db.Column(db.Date, nullable=False)
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
 
