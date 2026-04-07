@@ -2,58 +2,111 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Orçamentos - Meu Financeiro</title>
+    <title>Metas e Orçamentos - Meu Financeiro</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
-        body { background-color: #FDFDE5; font-family: 'Raleway', sans-serif; }
-        .card-custom { border-radius: 16px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
+        
+        :root { --cor-fundo: #FDFDE5; --cor-sidebar: #5F7254; --cor-botao: #783E19; --cor-botao-hover: #5c2e11; }
+        body { background-color: var(--cor-fundo); color: #333; font-family: 'Raleway', sans-serif; position: relative; }
+        .sidebar { background-color: var(--cor-sidebar); color: white; min-height: 100vh; padding: 20px; z-index: 10; }
+        .nav-link { color: rgba(255,255,255,0.8); font-weight: 600; }
+        .nav-link:hover, .nav-link.active { color: white; background-color: rgba(255,255,255,0.1); border-radius: 8px; }
+        .card-custom { border-radius: 16px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; z-index: 5; }
+        .btn-salvar { background-color: var(--cor-botao); color: white; font-weight: 700; border: none; position: relative; z-index: 5; }
+        .btn-salvar:hover { background-color: var(--cor-botao-hover); color: white; }
+
+        .money-rain { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
+        .money-rain i { position: absolute; bottom: -100px; color: #D4AF37; opacity: 0.15; animation: floatUp linear infinite; font-size: 2.5rem; text-shadow: 0 0 15px rgba(212, 175, 55, 0.5); }
+        @keyframes floatUp { 0% { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0; } 10% { opacity: 0.25; } 90% { opacity: 0.25; } 100% { transform: translateY(-110vh) rotate(360deg) scale(1.2); opacity: 0; } }
     </style>
 </head>
-<body class="p-4 p-md-5">
+<body>
 
-<div class="container" style="max-width: 800px;">
-    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-dark rounded-pill fw-bold mb-4">Voltar</a>
-    
-    <div class="card card-custom bg-white p-4 mb-4">
-        <h4 class="fw-bold mb-3" style="color: #5F7254;"><i class="bi bi-bullseye me-2"></i>Definir Meta de Gastos</h4>
-        <p class="text-muted small">Defina um valor máximo mensal para uma categoria. Isso ajudará você a controlar seus gastos no Dashboard.</p>
-        
-        <form class="row g-3 align-items-end" method="POST" autocomplete="off">
-            <div class="col-md-6">
-                <label class="form-label fw-bold">Categoria</label>
-                <select name="categoria" class="form-select" required>
-                    {% for c in categorias %}
-                        <option value="{{ c.nome }}">{{ c.nome }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label fw-bold">Limite (R$)</label>
-                <input type="text" name="valor_limite" class="form-control" placeholder="Ex: 800,00" required>
-            </div>
-            <div class="col-md-3">
-                <button type="submit" class="btn w-100 fw-bold" style="background-color: #783E19; color: white;">Salvar Meta</button>
-            </div>
-        </form>
-    </div>
-
-    <h5 class="fw-bold mb-3" style="color: #5F7254;">Orçamentos Ativos</h5>
-    <ul class="list-group list-group-flush rounded-3 shadow-sm">
-        {% for orc in orcamentos %}
-        <li class="list-group-item d-flex justify-content-between align-items-center p-3 border-0 mb-1 rounded bg-white">
-            <span class="fw-bold">{{ orc.categoria }}</span>
-            <div>
-                <span class="badge bg-light text-dark border me-3 fs-6">Limite: R$ {{ orc.valor_limite|formato_moeda }}</span>
-                <a href="{{ url_for('excluir_orcamento', id=orc.id) }}" class="btn btn-sm btn-outline-danger border-0"><i class="bi bi-trash-fill"></i></a>
-            </div>
-        </li>
-        {% else %}
-        <li class="list-group-item text-center text-muted p-4 border-0 rounded bg-white">Nenhum orçamento definido.</li>
-        {% endfor %}
-    </ul>
+<div class="money-rain">
+    <i class="bi bi-coin" style="left: 10%; animation-duration: 15s; animation-delay: 0s;"></i>
+    <i class="bi bi-currency-dollar" style="left: 25%; animation-duration: 12s; animation-delay: 2s; font-size: 3.5rem;"></i>
+    <i class="bi bi-gem" style="left: 40%; animation-duration: 18s; animation-delay: 5s; font-size: 2rem;"></i>
+    <i class="bi bi-coin" style="left: 60%; animation-duration: 14s; animation-delay: 1s;"></i>
+    <i class="bi bi-currency-dollar" style="left: 75%; animation-duration: 19s; animation-delay: 4s; font-size: 4rem;"></i>
+    <i class="bi bi-gem" style="left: 90%; animation-duration: 16s; animation-delay: 3s;"></i>
 </div>
 
+<div class="container-fluid">
+    <div class="row">
+        <nav class="col-md-2 d-none d-md-block sidebar shadow-lg" style="z-index: 10;">
+            <div class="text-center mb-5 mt-4">
+                <i class="bi bi-bank" style="font-size: 3rem; color: #D4AF37; text-shadow: 0 4px 10px rgba(0,0,0,0.3);"></i>
+                <h3 class="fw-bold mt-2" style="color: #D4AF37; font-family: 'Playfair Display', serif; letter-spacing: 1px;">Meu Financeiro</h3>
+            </div>
+            <ul class="nav flex-column gap-2">
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}"><i class="bi bi-pie-chart-fill me-2"></i> Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('lancamentos') }}"><i class="bi bi-wallet2 me-2"></i> Conta Corrente</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('cartoes') }}"><i class="bi bi-credit-card me-2"></i> Cartões de Crédito</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('investimentos') }}"><i class="bi bi-graph-up-arrow me-2"></i> Investimentos</a></li>
+                
+                <li class="nav-item mt-2 border-top pt-2 border-secondary">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#cadastrosMenu" role="button" aria-expanded="false">
+                        <i class="bi bi-folder-fill me-2"></i> Cadastros <i class="bi bi-chevron-down float-end mt-1" style="font-size: 0.8rem;"></i>
+                    </a>
+                    <div class="collapse" id="cadastrosMenu">
+                        <ul class="nav flex-column ms-3 mt-1 gap-1">
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('gerenciar_categorias') }}" style="font-size: 0.9rem;"><i class="bi bi-tags-fill me-2"></i> Categorias</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('orcamentos') }}" style="font-size: 0.9rem;"><i class="bi bi-bullseye me-2"></i> Orçamentos</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('gerenciar_formas') }}" style="font-size: 0.9rem;"><i class="bi bi-credit-card-fill me-2"></i> Pagamentos</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+
+        <main class="col-md-10 ms-sm-auto px-md-5 py-5 position-relative" style="z-index: 2;">
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-8">
+                    <div class="card card-custom p-5 bg-white">
+                        <h4 class="fw-bold mb-4" style="color: #5F7254;"><i class="bi bi-bullseye me-2"></i>Definir Meta de Gasto (Mensal)</h4>
+                        <form method="POST" class="row g-3" autocomplete="off">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Categoria</label>
+                                <select name="categoria" class="form-select" required>
+                                    {% for c in categorias %}<option value="{{ c.nome }}">{{ c.nome }}</option>{% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Teto de Gastos (R$)</label>
+                                <input type="text" name="valor_limite" class="form-control" placeholder="Ex: 500,00" required>
+                            </div>
+                            <div class="col-12 mt-4">
+                                <button type="submit" class="btn btn-salvar w-100 py-2 rounded-pill">Salvar Orçamento</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <h4 class="mt-5 mb-4 fw-bold text-center" style="color: #5F7254;">Orçamentos Ativos</h4>
+            <div class="row g-3 justify-content-center pb-5">
+                {% for o in orcamentos %}
+                <div class="col-md-4">
+                    <div class="card card-custom bg-white p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="fw-bold m-0 text-dark">{{ o.categoria }}</h5>
+                            <a href="{{ url_for('excluir_orcamento', id=o.id) }}" class="text-danger" onclick="return confirm('Excluir este orçamento?')"><i class="bi bi-trash-fill"></i></a>
+                        </div>
+                        <h3 class="fw-bold m-0" style="color: #783E19;">R$ {{ "{:,.2f}".format(o.valor_limite).replace(",", "X").replace(".", ",").replace("X", ".") }}</h3>
+                        <small class="text-muted fw-bold">Teto Mensal</small>
+                    </div>
+                </div>
+                {% else %}
+                <div class="col-12 text-center text-muted mt-3"><p>Nenhum orçamento configurado ainda.</p></div>
+                {% endfor %}
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

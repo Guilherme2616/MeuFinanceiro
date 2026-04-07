@@ -8,43 +8,72 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
+        
         :root { --cor-fundo: #FDFDE5; --cor-sidebar: #5F7254; --cor-botao: #783E19; --cor-botao-hover: #5c2e11; }
-        body { background-color: var(--cor-fundo); color: #333; font-family: 'Raleway', sans-serif; }
-        .sidebar { background-color: var(--cor-sidebar); color: white; min-height: 100vh; padding: 20px; }
+        body { background-color: var(--cor-fundo); color: #333; font-family: 'Raleway', sans-serif; position: relative; }
+        .sidebar { background-color: var(--cor-sidebar); color: white; min-height: 100vh; padding: 20px; z-index: 10; }
         .nav-link { color: rgba(255,255,255,0.8); font-weight: 600; }
         .nav-link:hover, .nav-link.active { color: white; background-color: rgba(255,255,255,0.1); border-radius: 8px; }
-        .card-custom { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .btn-salvar { background-color: var(--cor-botao); color: white; font-weight: 700; border: none; }
+        .card-custom { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative; z-index: 5; }
+        .btn-salvar { background-color: var(--cor-botao); color: white; font-weight: 700; border: none; position: relative; z-index: 5; }
         .btn-salvar:hover { background-color: var(--cor-botao-hover); color: white; }
-        .btn-logout { position: absolute; top: 20px; right: 20px; border-color: #dc3545; color: #dc3545; }
+        .btn-logout { position: absolute; top: 20px; right: 20px; border-color: #dc3545; color: #dc3545; z-index: 10; }
         .btn-logout:hover { background-color: #dc3545; color: white; }
+
+        /* Animações de Riqueza */
+        .money-rain { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
+        .money-rain i { position: absolute; bottom: -100px; color: #D4AF37; opacity: 0.15; animation: floatUp linear infinite; font-size: 2.5rem; text-shadow: 0 0 15px rgba(212, 175, 55, 0.5); }
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0; }
+            10% { opacity: 0.25; }
+            90% { opacity: 0.25; }
+            100% { transform: translateY(-110vh) rotate(360deg) scale(1.2); opacity: 0; }
+        }
     </style>
 </head>
 <body>
 
+<div class="money-rain">
+    <i class="bi bi-coin" style="left: 10%; animation-duration: 15s; animation-delay: 0s;"></i>
+    <i class="bi bi-currency-dollar" style="left: 25%; animation-duration: 12s; animation-delay: 2s; font-size: 3.5rem;"></i>
+    <i class="bi bi-gem" style="left: 40%; animation-duration: 18s; animation-delay: 5s; font-size: 2rem;"></i>
+    <i class="bi bi-coin" style="left: 60%; animation-duration: 14s; animation-delay: 1s;"></i>
+    <i class="bi bi-currency-dollar" style="left: 75%; animation-duration: 19s; animation-delay: 4s; font-size: 4rem;"></i>
+    <i class="bi bi-gem" style="left: 90%; animation-duration: 16s; animation-delay: 3s;"></i>
+</div>
+
 <div class="container-fluid">
     <div class="row">
-        <nav class="col-md-2 d-none d-md-block sidebar shadow-lg">
-            <h3 class="text-center mb-5 mt-3 fw-bold"><i class="bi bi-leaf me-2"></i>Meu Financeiro</h3>
+        <nav class="col-md-2 d-none d-md-block sidebar shadow-lg" style="position: sticky; top: 0; height: 100vh; overflow-y: auto; z-index: 10;">
+            
+            <div class="text-center mb-5 mt-4">
+                <i class="bi bi-bank" style="font-size: 3rem; color: #D4AF37; text-shadow: 0 4px 10px rgba(0,0,0,0.3);"></i>
+                <h3 class="fw-bold mt-2" style="color: #D4AF37; font-family: 'Playfair Display', serif; letter-spacing: 1px;">Meu Financeiro</h3>
+            </div>
+
             <ul class="nav flex-column gap-2">
-                <li class="nav-item"><a class="nav-link active" href="{{ url_for('dashboard') }}"><i class="bi bi-pie-chart-fill me-2"></i> Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('lancamentos') }}"><i class="bi bi-card-list me-2"></i> Lançamentos</a></li>
+                <li class="nav-item"><a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}"><i class="bi bi-pie-chart-fill me-2"></i> Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link {% if request.endpoint == 'lancamentos' %}active{% endif %}" href="{{ url_for('lancamentos') }}"><i class="bi bi-wallet2 me-2"></i> Conta Corrente</a></li>
+                <li class="nav-item"><a class="nav-link {% if request.endpoint == 'cartoes' %}active{% endif %}" href="{{ url_for('cartoes') }}"><i class="bi bi-credit-card me-2"></i> Cartões de Crédito</a></li>
+                <li class="nav-item"><a class="nav-link {% if request.endpoint == 'investimentos' %}active{% endif %}" href="{{ url_for('investimentos') }}"><i class="bi bi-graph-up-arrow me-2"></i> Investimentos</a></li>
+                
                 <li class="nav-item mt-2 border-top pt-2 border-secondary">
-                    <a class="nav-link" data-bs-toggle="collapse" href="#cadastrosMenu" role="button" aria-expanded="false">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#cadastrosMenu" role="button" aria-expanded="{% if request.endpoint in ['gerenciar_categorias', 'orcamentos', 'gerenciar_formas'] %}true{% else %}false{% endif %}">
                         <i class="bi bi-folder-fill me-2"></i> Cadastros <i class="bi bi-chevron-down float-end mt-1" style="font-size: 0.8rem;"></i>
                     </a>
-                    <div class="collapse" id="cadastrosMenu">
+                    <div class="collapse {% if request.endpoint in ['gerenciar_categorias', 'orcamentos', 'gerenciar_formas'] %}show{% endif %}" id="cadastrosMenu">
                         <ul class="nav flex-column ms-3 mt-1 gap-1">
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('gerenciar_categorias') }}" style="font-size: 0.9rem;"><i class="bi bi-tags-fill me-2"></i> Categorias</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('orcamentos') }}" style="font-size: 0.9rem;"><i class="bi bi-bullseye me-2"></i> Orçamentos</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('gerenciar_formas') }}" style="font-size: 0.9rem;"><i class="bi bi-credit-card-fill me-2"></i> Pagamentos</a></li>
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'gerenciar_categorias' %}active{% endif %}" href="{{ url_for('gerenciar_categorias') }}" style="font-size: 0.9rem;"><i class="bi bi-tags-fill me-2"></i> Categorias</a></li>
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'orcamentos' %}active{% endif %}" href="{{ url_for('orcamentos') }}" style="font-size: 0.9rem;"><i class="bi bi-bullseye me-2"></i> Orçamentos</a></li>
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'gerenciar_formas' %}active{% endif %}" href="{{ url_for('gerenciar_formas') }}" style="font-size: 0.9rem;"><i class="bi bi-credit-card-fill me-2"></i> Pagamentos</a></li>
                         </ul>
                     </div>
                 </li>
             </ul>
         </nav>
 
-        <main class="col-md-10 ms-sm-auto px-md-5 position-relative">
+        <main class="col-md-10 ms-sm-auto px-md-5 position-relative" style="z-index: 2;">
             <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-sm btn-logout fw-bold rounded-pill px-4">Sair</a>
             <div class="pt-4 pb-2 mb-4 border-bottom border-dark-subtle mt-3 d-flex justify-content-between align-items-end"><h2 class="fw-bold m-0">Visão Geral</h2></div>
 
@@ -156,49 +185,29 @@
 <script>
     Chart.defaults.font.family = "'Raleway', sans-serif";
     
-    // 1. Gráfico de Categorias e Subcategorias
     const labelsCat = {{ labels_cat | tojson | safe }};
     const valoresCat = {{ valores_cat | tojson | safe }};
     const coresCat = {{ cores_cat | tojson | safe }};
-
     if (labelsCat.length > 0) {
         const ctxCategorias = document.getElementById('graficoCategorias').getContext('2d');
-        new Chart(ctxCategorias, {
-            type: 'doughnut',
-            data: { labels: labelsCat, datasets: [{ data: valoresCat, backgroundColor: coresCat, borderWidth: 2, borderColor: '#fff' }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
-        });
+        new Chart(ctxCategorias, { type: 'doughnut', data: { labels: labelsCat, datasets: [{ data: valoresCat, backgroundColor: coresCat, borderWidth: 2, borderColor: '#fff' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } } });
     }
 
-    // 2. Gráfico de Formas de Pagamento
     const labelsPagto = {{ labels_pagto | tojson | safe }};
     const valoresPagto = {{ valores_pagto | tojson | safe }};
     const coresPagto = {{ cores_pagto | tojson | safe }};
-
     if (labelsPagto.length > 0) {
         const ctxPagto = document.getElementById('graficoPagamentos').getContext('2d');
-        new Chart(ctxPagto, {
-            type: 'pie',
-            data: { labels: labelsPagto, datasets: [{ data: valoresPagto, backgroundColor: coresPagto, borderWidth: 2, borderColor: '#fff' }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
-        });
+        new Chart(ctxPagto, { type: 'pie', data: { labels: labelsPagto, datasets: [{ data: valoresPagto, backgroundColor: coresPagto, borderWidth: 2, borderColor: '#fff' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } } });
     }
 
-    // 3. Gráfico Balanço Simples (Barras)
     const ctxBalanco = document.getElementById('graficoBalanco').getContext('2d');
     new Chart(ctxBalanco, {
         type: 'bar',
-        data: {
-            labels: ['Entradas', 'Saídas'],
-            datasets: [{
-                label: 'Valor (R$)', data: [{{ t_entrada }}, {{ t_saida }}],
-                backgroundColor: ['rgba(25, 135, 84, 0.8)', 'rgba(220, 53, 69, 0.8)'], borderRadius: 8
-            }]
-        },
+        data: { labels: ['Entradas', 'Saídas'], datasets: [{ label: 'Valor (R$)', data: [{{ t_entrada }}, {{ t_saida }}], backgroundColor: ['rgba(25, 135, 84, 0.8)', 'rgba(220, 53, 69, 0.8)'], borderRadius: 8 }] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
     });
 
-    // 4. Gráfico Misto Mês a Mês
     const ctxMensal = document.getElementById('graficoMensalMixto').getContext('2d');
     new Chart(ctxMensal, {
         type: 'bar',
@@ -211,11 +220,7 @@
                 { label: 'Teto de Orçamento Total', type: 'line', data: {{ dados_orcamento_mes | tojson | safe }}, borderColor: '#ffc107', backgroundColor: '#ffc107', borderDash: [5, 5], borderWidth: 2, pointRadius: 4, fill: false }
             ]
         },
-        options: {
-            responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false, },
-            plugins: { legend: { display: true, position: 'top', labels: { usePointStyle: true, padding: 20 } } },
-            scales: { y: { beginAtZero: true } }
-        }
+        options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false, }, plugins: { legend: { display: true, position: 'top', labels: { usePointStyle: true, padding: 20 } } }, scales: { y: { beginAtZero: true } } }
     });
 </script>
 </body>

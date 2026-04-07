@@ -7,74 +7,157 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
-        body { background-color: #FDFDE5; font-family: 'Raleway', sans-serif; color: #333; }
-        .btn-salvar { background-color: #783E19; color: white; font-weight: 700; border: none; }
-        .btn-salvar:hover { background-color: #5c2e11; color: white; }
-        .icon-selector input[type="radio"] { display: none; }
-        .icon-selector label {
-            display: inline-block; padding: 10px 15px; margin: 5px; 
-            font-size: 1.5rem; border: 2px solid transparent; 
-            border-radius: 12px; cursor: pointer; transition: 0.2s;
-            background-color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            text-align: center;
-        }
-        .icon-selector input[type="radio"]:checked + label { border-color: #5F7254; background-color: #e9f0e6; color: #5F7254; transform: scale(1.1); }
-        .card-custom { border-radius: 16px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
+        
+        :root { --cor-fundo: #FDFDE5; --cor-sidebar: #5F7254; --cor-botao: #783E19; --cor-botao-hover: #5c2e11; }
+        body { background-color: var(--cor-fundo); color: #333; font-family: 'Raleway', sans-serif; position: relative; }
+        
+        /* Menu e Cards */
+        .sidebar { background-color: var(--cor-sidebar); color: white; }
+        .nav-link { color: rgba(255,255,255,0.8); font-weight: 600; }
+        .nav-link:hover, .nav-link.active { color: white; background-color: rgba(255,255,255,0.1); border-radius: 8px; }
+        .card-custom { border-radius: 16px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; z-index: 5; }
         .header-bg { background-color: #5F7254; color: white; border-radius: 16px 16px 0 0; padding: 15px; }
+        .btn-salvar { background-color: var(--cor-botao); color: white; font-weight: 700; border: none; position: relative; z-index: 5; }
+        .btn-salvar:hover { background-color: var(--cor-botao-hover); color: white; }
+
+        /* Ícones de Seleção */
+        .icon-selector input[type="radio"] { display: none; }
+        .icon-selector label { display: inline-block; padding: 10px 15px; margin: 5px; font-size: 1.5rem; border: 2px solid transparent; border-radius: 12px; cursor: pointer; transition: 0.2s; background-color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative; z-index: 5;}
+        .icon-selector input[type="radio"]:checked + label { border-color: #5F7254; background-color: #e9f0e6; color: #5F7254; transform: scale(1.1); }
+
+        /* Animações de Riqueza */
+        .money-rain { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
+        .money-rain i { position: absolute; bottom: -100px; color: #D4AF37; opacity: 0.15; animation: floatUp linear infinite; font-size: 2.5rem; text-shadow: 0 0 15px rgba(212, 175, 55, 0.5); }
+        @keyframes floatUp { 0% { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0; } 10% { opacity: 0.25; } 90% { opacity: 0.25; } 100% { transform: translateY(-110vh) rotate(360deg) scale(1.2); opacity: 0; } }
     </style>
 </head>
-<body class="p-4 p-md-5">
+<body>
 
-<div class="container" style="max-width: 900px;">
-    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-dark rounded-pill fw-bold mb-4"><i class="bi bi-arrow-left me-2"></i>Voltar</a>
-    
-    <div class="row g-4 justify-content-center">
-        <div class="col-md-10">
-            <div class="card card-custom h-100 bg-white">
-                <div class="header-bg fw-bold fs-5"><i class="bi bi-credit-card-fill me-2"></i>Nova Forma de Pagamento</div>
-                <div class="card-body p-4">
-                    <form method="POST" autocomplete="off">
-                        <div class="row mb-3">
-                            <div class="col-9"><label class="form-label fw-bold">Nome da Forma</label><input type="text" name="nome" class="form-control" placeholder="Ex: Cartão Nubank, VR..." required></div>
-                            <div class="col-3"><label class="form-label fw-bold">Cor Fundo</label><input type="color" name="cor" class="form-control form-control-color w-100" value="#20c997" title="Escolha a cor"></div>
-                        </div>
+<div class="money-rain">
+    <i class="bi bi-coin" style="left: 10%; animation-duration: 15s; animation-delay: 0s;"></i>
+    <i class="bi bi-currency-dollar" style="left: 25%; animation-duration: 12s; animation-delay: 2s; font-size: 3.5rem;"></i>
+    <i class="bi bi-gem" style="left: 40%; animation-duration: 18s; animation-delay: 5s; font-size: 2rem;"></i>
+    <i class="bi bi-coin" style="left: 60%; animation-duration: 14s; animation-delay: 1s;"></i>
+    <i class="bi bi-currency-dollar" style="left: 75%; animation-duration: 19s; animation-delay: 4s; font-size: 4rem;"></i>
+    <i class="bi bi-gem" style="left: 90%; animation-duration: 16s; animation-delay: 3s;"></i>
+</div>
 
-                        <label class="form-label fw-bold mt-2">Escolha um Ícone</label>
-                        <div class="icon-selector mb-4">
-                            <input type="radio" id="ic1" name="icone" value="bi-credit-card" checked><label for="ic1"><i class="bi bi-credit-card"></i></label>
-                            <input type="radio" id="ic2" name="icone" value="bi-cash-stack"><label for="ic2"><i class="bi bi-cash-stack"></i></label>
-                            <input type="radio" id="ic3" name="icone" value="bi-phone"><label for="ic3"><i class="bi bi-phone"></i></label>
-                            <input type="radio" id="ic4" name="icone" value="bi-bank"><label for="ic4"><i class="bi bi-bank"></i></label>
-                            <input type="radio" id="ic5" name="icone" value="bi-wallet2"><label for="ic5"><i class="bi bi-wallet2"></i></label>
-                            <input type="radio" id="ic6" name="icone" value="bi-coin"><label for="ic6"><i class="bi bi-coin"></i></label>
-                            <input type="radio" id="ic7" name="icone" value="bi-qr-code-scan"><label for="ic7"><i class="bi bi-qr-code-scan"></i></label>
-                            <input type="radio" id="ic8" name="icone" value="bi-currency-dollar"><label for="ic8"><i class="bi bi-currency-dollar"></i></label>
-                        </div>
-                        <button type="submit" class="btn btn-salvar w-100 py-2 rounded-pill">Salvar Pagamento</button>
-                    </form>
-                </div>
+<div class="container-fluid">
+    <div class="row">
+        <nav class="col-md-2 d-none d-md-block sidebar shadow-lg" style="position: sticky; top: 0; height: 100vh; overflow-y: auto; z-index: 10;">
+            <div class="text-center mb-5 mt-4">
+                <i class="bi bi-bank" style="font-size: 3rem; color: #D4AF37; text-shadow: 0 4px 10px rgba(0,0,0,0.3);"></i>
+                <h3 class="fw-bold mt-2" style="color: #D4AF37; font-family: 'Playfair Display', serif; letter-spacing: 1px;">Meu Financeiro</h3>
             </div>
-        </div>
-    </div>
-
-    <h4 class="mt-5 mb-4 fw-bold text-center" style="color: #5F7254;">Formas Cadastradas</h4>
-    <div class="row g-3 justify-content-center">
-        {% for f in formas %}
-        <div class="col-md-4">
-            <div class="card card-custom bg-white p-3 border-top border-5" style="border-color: {{ f.cor }} !important;">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="fw-bold m-0 text-dark d-flex align-items-center"><i class="bi {{ f.icone }} me-2" style="color: {{ f.cor }};"></i>{{ f.nome }}</h5>
+            <ul class="nav flex-column gap-2">
+                <li class="nav-item"><a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}"><i class="bi bi-pie-chart-fill me-2"></i> Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link {% if request.endpoint == 'lancamentos' %}active{% endif %}" href="{{ url_for('lancamentos') }}"><i class="bi bi-wallet2 me-2"></i> Conta Corrente</a></li>
+                <li class="nav-item"><a class="nav-link {% if request.endpoint == 'cartoes' %}active{% endif %}" href="{{ url_for('cartoes') }}"><i class="bi bi-credit-card me-2"></i> Cartões de Crédito</a></li>
+                <li class="nav-item"><a class="nav-link {% if request.endpoint == 'investimentos' %}active{% endif %}" href="{{ url_for('investimentos') }}"><i class="bi bi-graph-up-arrow me-2"></i> Investimentos</a></li>
+                
+                <li class="nav-item mt-2 border-top pt-2 border-secondary">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#cadastrosMenu" role="button" aria-expanded="{% if request.endpoint in ['gerenciar_categorias', 'orcamentos', 'gerenciar_formas'] %}true{% else %}false{% endif %}">
+                        <i class="bi bi-folder-fill me-2"></i> Cadastros <i class="bi bi-chevron-down float-end mt-1" style="font-size: 0.8rem;"></i>
+                    </a>
+                    <div class="collapse {% if request.endpoint in ['gerenciar_categorias', 'orcamentos', 'gerenciar_formas'] %}show{% endif %}" id="cadastrosMenu">
+                        <ul class="nav flex-column ms-3 mt-1 gap-1">
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'gerenciar_categorias' %}active{% endif %}" href="{{ url_for('gerenciar_categorias') }}" style="font-size: 0.9rem;"><i class="bi bi-tags-fill me-2"></i> Categorias</a></li>
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'orcamentos' %}active{% endif %}" href="{{ url_for('orcamentos') }}" style="font-size: 0.9rem;"><i class="bi bi-bullseye me-2"></i> Orçamentos</a></li>
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'gerenciar_formas' %}active{% endif %}" href="{{ url_for('gerenciar_formas') }}" style="font-size: 0.9rem;"><i class="bi bi-credit-card-fill me-2"></i> Pagamentos</a></li>
+                        </ul>
                     </div>
-                    <a href="{{ url_for('excluir_forma', id=f.id) }}" class="text-danger" onclick="return confirm('Excluir esta forma de pagamento?')"><i class="bi bi-trash-fill"></i></a>
+                </li>
+            </ul>
+        </nav>
+
+        <main class="col-md-10 ms-sm-auto px-md-5 py-5 position-relative" style="z-index: 2;">
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-10">
+                    <div class="card card-custom h-100 bg-white">
+                        <div class="header-bg fw-bold fs-5"><i class="bi bi-credit-card-fill me-2"></i>Nova Forma de Pagamento</div>
+                        <div class="card-body p-4">
+                            <form method="POST" autocomplete="off">
+                                <div class="row mb-3">
+                                    <div class="col-9"><label class="form-label fw-bold">Nome da Forma</label><input type="text" name="nome" class="form-control" placeholder="Ex: Cartão Nubank, VR..." required></div>
+                                    <div class="col-3"><label class="form-label fw-bold">Cor Fundo</label><input type="color" name="cor" class="form-control form-control-color w-100" value="#20c997" title="Escolha a cor"></div>
+                                </div>
+
+                                <div class="form-check form-switch mb-3 mt-4" style="position: relative; z-index: 5;">
+                                    <input class="form-check-input" type="checkbox" id="switchCredito" name="is_credito">
+                                    <label class="form-check-label fw-bold" for="switchCredito">É um Cartão de Crédito?</label>
+                                </div>
+                                <div class="row mb-4" id="divDatasCredito" style="display: none; background-color: #f8f9fa; padding: 15px; border-radius: 10px; position: relative; z-index: 5;">
+                                    <div class="col-6">
+                                        <label class="form-label fw-bold text-muted small">Dia de Fechamento da Fatura</label>
+                                        <input type="number" name="dia_fechamento" class="form-control" min="1" max="31" placeholder="Ex: 5">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label fw-bold text-muted small">Dia de Vencimento (Pagar)</label>
+                                        <input type="number" name="dia_vencimento" class="form-control" min="1" max="31" placeholder="Ex: 12">
+                                    </div>
+                                </div>
+
+                                <label class="form-label fw-bold mt-2">Escolha um Ícone</label>
+                                <div class="icon-selector mb-4">
+                                    <input type="radio" id="ic1" name="icone" value="bi-credit-card" checked><label for="ic1"><i class="bi bi-credit-card"></i></label>
+                                    <input type="radio" id="ic2" name="icone" value="bi-cash-stack"><label for="ic2"><i class="bi bi-cash-stack"></i></label>
+                                    <input type="radio" id="ic3" name="icone" value="bi-phone"><label for="ic3"><i class="bi bi-phone"></i></label>
+                                    <input type="radio" id="ic4" name="icone" value="bi-bank"><label for="ic4"><i class="bi bi-bank"></i></label>
+                                    <input type="radio" id="ic5" name="icone" value="bi-wallet2"><label for="ic5"><i class="bi bi-wallet2"></i></label>
+                                    <input type="radio" id="ic6" name="icone" value="bi-coin"><label for="ic6"><i class="bi bi-coin"></i></label>
+                                    <input type="radio" id="ic7" name="icone" value="bi-qr-code-scan"><label for="ic7"><i class="bi bi-qr-code-scan"></i></label>
+                                    <input type="radio" id="ic8" name="icone" value="bi-currency-dollar"><label for="ic8"><i class="bi bi-currency-dollar"></i></label>
+                                </div>
+                                <button type="submit" class="btn btn-salvar w-100 py-2 rounded-pill">Salvar Pagamento</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        {% else %}
-        <div class="col-12 text-center text-muted mt-3"><p>Nenhuma forma de pagamento foi encontrada.</p></div>
-        {% endfor %}
+
+            <h4 class="mt-5 mb-4 fw-bold text-center" style="color: #5F7254;">Formas Cadastradas</h4>
+            <div class="row g-3 justify-content-center pb-5">
+                {% for f in formas %}
+                <div class="col-md-4">
+                    <div class="card card-custom bg-white p-3 border-top border-5" style="border-color: {{ f.cor }} !important;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="fw-bold m-0 text-dark d-flex align-items-center"><i class="bi {{ f.icone }} me-2" style="color: {{ f.cor }};"></i>{{ f.nome }}</h5>
+                                {% if f.is_credito %}
+                                    <small class="text-muted d-block mt-1">Fecha dia {{ f.dia_fechamento }} | Vence dia {{ f.dia_vencimento }}</small>
+                                {% endif %}
+                            </div>
+                            <a href="{{ url_for('excluir_forma', id=f.id) }}" class="text-danger position-relative" style="z-index: 10;" onclick="return confirm('Excluir esta forma de pagamento?')"><i class="bi bi-trash-fill"></i></a>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="col-12 text-center text-muted mt-3"><p>Nenhuma forma de pagamento foi encontrada.</p></div>
+                {% endfor %}
+            </div>
+        </main>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const switchCredito = document.getElementById('switchCredito');
+    const divDatas = document.getElementById('divDatasCredito');
+    const inputsDatas = divDatas.querySelectorAll('input');
+
+    switchCredito.addEventListener('change', function() {
+        if(this.checked) {
+            divDatas.style.display = 'flex';
+            inputsDatas.forEach(input => input.setAttribute('required', 'required'));
+        } else {
+            divDatas.style.display = 'none';
+            inputsDatas.forEach(input => input.removeAttribute('required'));
+            inputsDatas.forEach(input => input.value = ''); // Limpa os campos se desmarcar
+        }
+    });
+</script>
 
 </body>
 </html>

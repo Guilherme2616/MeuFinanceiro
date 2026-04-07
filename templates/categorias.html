@@ -7,112 +7,153 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
-        body { background-color: #FDFDE5; font-family: 'Raleway', sans-serif; color: #333; }
-        .btn-salvar { background-color: #783E19; color: white; font-weight: 700; border: none; }
-        .btn-salvar:hover { background-color: #5c2e11; color: white; }
-        .icon-selector input[type="radio"] { display: none; }
-        .icon-selector label {
-            display: inline-block; padding: 10px 15px; margin: 5px; 
-            font-size: 1.5rem; border: 2px solid transparent; 
-            border-radius: 12px; cursor: pointer; transition: 0.2s;
-            background-color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .icon-selector input[type="radio"]:checked + label {
-            border-color: #5F7254; background-color: #e9f0e6; color: #5F7254; transform: scale(1.1);
-        }
-        .card-custom { border-radius: 16px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
+        
+        :root { --cor-fundo: #FDFDE5; --cor-sidebar: #5F7254; --cor-botao: #783E19; --cor-botao-hover: #5c2e11; }
+        body { background-color: var(--cor-fundo); color: #333; font-family: 'Raleway', sans-serif; position: relative; }
+        .sidebar { background-color: var(--cor-sidebar); color: white; min-height: 100vh; padding: 20px; z-index: 10; }
+        .nav-link { color: rgba(255,255,255,0.8); font-weight: 600; }
+        .nav-link:hover, .nav-link.active { color: white; background-color: rgba(255,255,255,0.1); border-radius: 8px; }
+        .card-custom { border-radius: 16px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; z-index: 5; }
+        .btn-salvar { background-color: var(--cor-botao); color: white; font-weight: 700; border: none; position: relative; z-index: 5; }
+        .btn-salvar:hover { background-color: var(--cor-botao-hover); color: white; }
         .header-bg { background-color: #5F7254; color: white; border-radius: 16px 16px 0 0; padding: 15px; }
+
+        .icon-selector input[type="radio"] { display: none; }
+        .icon-selector label { display: inline-block; padding: 10px 15px; margin: 5px; font-size: 1.5rem; border: 2px solid transparent; border-radius: 12px; cursor: pointer; transition: 0.2s; background-color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .icon-selector input[type="radio"]:checked + label { border-color: #5F7254; background-color: #e9f0e6; color: #5F7254; transform: scale(1.1); }
+
+        .money-rain { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
+        .money-rain i { position: absolute; bottom: -100px; color: #D4AF37; opacity: 0.15; animation: floatUp linear infinite; font-size: 2.5rem; text-shadow: 0 0 15px rgba(212, 175, 55, 0.5); }
+        @keyframes floatUp { 0% { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0; } 10% { opacity: 0.25; } 90% { opacity: 0.25; } 100% { transform: translateY(-110vh) rotate(360deg) scale(1.2); opacity: 0; } }
     </style>
 </head>
-<body class="p-4 p-md-5">
+<body>
 
-<div class="container" style="max-width: 900px;">
-    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-dark rounded-pill fw-bold mb-4"><i class="bi bi-arrow-left me-2"></i>Voltar</a>
-    
-    <div class="row g-4">
-        <div class="col-md-6">
-            <div class="card card-custom h-100 bg-white">
-                <div class="header-bg fw-bold"><i class="bi bi-tag-fill me-2"></i>Nova Categoria</div>
-                <div class="card-body p-4">
-                    <form method="POST" autocomplete="off">
-                        <input type="hidden" name="tipo_form" value="categoria">
-                        <div class="row mb-3">
-                            <div class="col-9">
-                                <label class="form-label fw-bold">Nome da Categoria</label>
-                                <input type="text" name="nome" class="form-control" placeholder="Ex: Festas..." required>
-                            </div>
-                            <div class="col-3">
-                                <label class="form-label fw-bold">Cor</label>
-                                <input type="color" name="cor" class="form-control form-control-color w-100" value="#5F7254" title="Escolha a cor">
-                            </div>
+<div class="money-rain">
+    <i class="bi bi-coin" style="left: 10%; animation-duration: 15s; animation-delay: 0s;"></i>
+    <i class="bi bi-currency-dollar" style="left: 25%; animation-duration: 12s; animation-delay: 2s; font-size: 3.5rem;"></i>
+    <i class="bi bi-gem" style="left: 40%; animation-duration: 18s; animation-delay: 5s; font-size: 2rem;"></i>
+    <i class="bi bi-coin" style="left: 60%; animation-duration: 14s; animation-delay: 1s;"></i>
+    <i class="bi bi-currency-dollar" style="left: 75%; animation-duration: 19s; animation-delay: 4s; font-size: 4rem;"></i>
+    <i class="bi bi-gem" style="left: 90%; animation-duration: 16s; animation-delay: 3s;"></i>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <nav class="col-md-2 d-none d-md-block sidebar shadow-lg" style="z-index: 10;">
+            <div class="text-center mb-5 mt-4">
+                <i class="bi bi-bank" style="font-size: 3rem; color: #D4AF37; text-shadow: 0 4px 10px rgba(0,0,0,0.3);"></i>
+                <h3 class="fw-bold mt-2" style="color: #D4AF37; font-family: 'Playfair Display', serif; letter-spacing: 1px;">Meu Financeiro</h3>
+            </div>
+            <ul class="nav flex-column gap-2">
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}"><i class="bi bi-pie-chart-fill me-2"></i> Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('lancamentos') }}"><i class="bi bi-wallet2 me-2"></i> Conta Corrente</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('cartoes') }}"><i class="bi bi-credit-card me-2"></i> Cartões de Crédito</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('investimentos') }}"><i class="bi bi-graph-up-arrow me-2"></i> Investimentos</a></li>
+                
+                <li class="nav-item mt-2 border-top pt-2 border-secondary">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#cadastrosMenu" role="button" aria-expanded="false">
+                        <i class="bi bi-folder-fill me-2"></i> Cadastros <i class="bi bi-chevron-down float-end mt-1" style="font-size: 0.8rem;"></i>
+                    </a>
+                    <div class="collapse" id="cadastrosMenu">
+                        <ul class="nav flex-column ms-3 mt-1 gap-1">
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('gerenciar_categorias') }}" style="font-size: 0.9rem;"><i class="bi bi-tags-fill me-2"></i> Categorias</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('orcamentos') }}" style="font-size: 0.9rem;"><i class="bi bi-bullseye me-2"></i> Orçamentos</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('gerenciar_formas') }}" style="font-size: 0.9rem;"><i class="bi bi-credit-card-fill me-2"></i> Pagamentos</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+
+        <main class="col-md-10 ms-sm-auto px-md-5 py-5 position-relative" style="z-index: 2;">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card card-custom h-100 bg-white">
+                        <div class="header-bg fw-bold"><i class="bi bi-tag-fill me-2"></i>Nova Categoria</div>
+                        <div class="card-body p-4">
+                            <form method="POST" autocomplete="off">
+                                <input type="hidden" name="tipo_form" value="categoria">
+                                <div class="row mb-3">
+                                    <div class="col-9">
+                                        <label class="form-label fw-bold">Nome da Categoria</label>
+                                        <input type="text" name="nome" class="form-control" placeholder="Ex: Festas..." required>
+                                    </div>
+                                    <div class="col-3">
+                                        <label class="form-label fw-bold">Cor</label>
+                                        <input type="color" name="cor" class="form-control form-control-color w-100" value="#5F7254" title="Escolha a cor">
+                                    </div>
+                                </div>
+                                <label class="form-label fw-bold mt-2">Escolha um Ícone</label>
+                                <div class="icon-selector mb-4">
+                                    <input type="radio" id="ic1" name="icone" value="bi-house-door" checked><label for="ic1"><i class="bi bi-house-door"></i></label>
+                                    <input type="radio" id="ic2" name="icone" value="bi-cart"><label for="ic2"><i class="bi bi-cart"></i></label>
+                                    <input type="radio" id="ic3" name="icone" value="bi-car-front"><label for="ic3"><i class="bi bi-car-front"></i></label>
+                                    <input type="radio" id="ic4" name="icone" value="bi-balloon"><label for="ic4"><i class="bi bi-balloon"></i></label>
+                                    <input type="radio" id="ic5" name="icone" value="bi-heart-pulse"><label for="ic5"><i class="bi bi-heart-pulse"></i></label>
+                                    <input type="radio" id="ic6" name="icone" value="bi-controller"><label for="ic6"><i class="bi bi-controller"></i></label>
+                                    <input type="radio" id="ic7" name="icone" value="bi-mortarboard"><label for="ic7"><i class="bi bi-mortarboard"></i></label>
+                                    <input type="radio" id="ic8" name="icone" value="bi-airplane"><label for="ic8"><i class="bi bi-airplane"></i></label>
+                                    <input type="radio" id="ic9" name="icone" value="bi-lightning-charge"><label for="ic9"><i class="bi bi-lightning-charge"></i></label>
+                                    <input type="radio" id="ic10" name="icone" value="bi-piggy-bank"><label for="ic10"><i class="bi bi-piggy-bank"></i></label>
+                                </div>
+                                <button type="submit" class="btn btn-salvar w-100 py-2 rounded-pill">Salvar Categoria</button>
+                            </form>
                         </div>
-                        <label class="form-label fw-bold mt-2">Escolha um Ícone</label>
-                        <div class="icon-selector mb-4">
-                            <input type="radio" id="ic1" name="icone" value="bi-house-door" checked><label for="ic1"><i class="bi bi-house-door"></i></label>
-                            <input type="radio" id="ic2" name="icone" value="bi-cart"><label for="ic2"><i class="bi bi-cart"></i></label>
-                            <input type="radio" id="ic3" name="icone" value="bi-car-front"><label for="ic3"><i class="bi bi-car-front"></i></label>
-                            <input type="radio" id="ic4" name="icone" value="bi-balloon"><label for="ic4"><i class="bi bi-balloon"></i></label>
-                            <input type="radio" id="ic5" name="icone" value="bi-heart-pulse"><label for="ic5"><i class="bi bi-heart-pulse"></i></label>
-                            <input type="radio" id="ic6" name="icone" value="bi-controller"><label for="ic6"><i class="bi bi-controller"></i></label>
-                            <input type="radio" id="ic7" name="icone" value="bi-mortarboard"><label for="ic7"><i class="bi bi-mortarboard"></i></label>
-                            <input type="radio" id="ic8" name="icone" value="bi-airplane"><label for="ic8"><i class="bi bi-airplane"></i></label>
-                            <input type="radio" id="ic9" name="icone" value="bi-lightning-charge"><label for="ic9"><i class="bi bi-lightning-charge"></i></label>
-                            <input type="radio" id="ic10" name="icone" value="bi-piggy-bank"><label for="ic10"><i class="bi bi-piggy-bank"></i></label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card card-custom h-100 bg-white">
+                        <div class="header-bg fw-bold" style="background-color: #4a5c41;"><i class="bi bi-diagram-2-fill me-2"></i>Nova Subcategoria</div>
+                        <div class="card-body p-4">
+                            <form method="POST" autocomplete="off">
+                                <input type="hidden" name="tipo_form" value="subcategoria">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Pertence à qual Categoria?</label>
+                                    <select name="categoria_id" class="form-select" required>
+                                        {% for cat in categorias %}<option value="{{ cat.id }}">{{ cat.nome }}</option>{% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Nome da Subcategoria</label>
+                                    <input type="text" name="nome" class="form-control" placeholder="Ex: Decoração..." required>
+                                </div>
+                                <button type="submit" class="btn btn-salvar w-100 py-2 rounded-pill">Salvar Subcategoria</button>
+                            </form>
                         </div>
-                        <button type="submit" class="btn btn-salvar w-100 py-2 rounded-pill">Salvar Categoria</button>
-                    </form>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="col-md-6">
-            <div class="card card-custom h-100 bg-white">
-                <div class="header-bg fw-bold" style="background-color: #4a5c41;"><i class="bi bi-diagram-2-fill me-2"></i>Nova Subcategoria</div>
-                <div class="card-body p-4">
-                    <form method="POST" autocomplete="off">
-                        <input type="hidden" name="tipo_form" value="subcategoria">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Pertence à qual Categoria?</label>
-                            <select name="categoria_id" class="form-select" required>
-                                {% for cat in categorias %}<option value="{{ cat.id }}">{{ cat.nome }}</option>{% endfor %}
-                            </select>
+            <h4 class="mt-5 mb-4 fw-bold" style="color: #5F7254;">Suas Categorias</h4>
+            <div class="row g-3 pb-5">
+                {% for cat in categorias %}
+                <div class="col-md-4">
+                    <div class="card card-custom bg-white p-3 border-top border-5" style="border-color: {{ cat.cor }} !important;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="fw-bold m-0"><i class="bi {{ cat.icone }} me-2" style="color: {{ cat.cor }};"></i>{{ cat.nome }}</h5>
+                            <a href="{{ url_for('excluir_categoria', id=cat.id) }}" class="text-danger" onclick="return confirm('Excluir esta categoria apagará todas as subcategorias dela. Confirmar?')"><i class="bi bi-trash-fill"></i></a>
                         </div>
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Nome da Subcategoria</label>
-                            <input type="text" name="nome" class="form-control" placeholder="Ex: Decoração..." required>
-                        </div>
-                        <button type="submit" class="btn btn-salvar w-100 py-2 rounded-pill">Salvar Subcategoria</button>
-                    </form>
+                        <ul class="list-unstyled ms-4 mt-2 mb-0 small text-muted fw-bold">
+                            {% for sub in cat.subcategorias %}
+                            <li class="d-flex justify-content-between align-items-center mb-1">
+                                <span><i class="bi bi-arrow-return-right me-1"></i> {{ sub.nome }}</span>
+                                <div>
+                                    <button type="button" class="btn btn-sm text-primary p-0 me-2" onclick="editarSubcategoria({{ sub.id }}, '{{ sub.nome }}')" title="Editar Subcategoria"><i class="bi bi-pencil-fill"></i></button>
+                                    <a href="{{ url_for('excluir_subcategoria', id=sub.id) }}" class="text-danger p-0" onclick="return confirm('Excluir esta subcategoria?')" title="Excluir Subcategoria"><i class="bi bi-trash-fill"></i></a>
+                                </div>
+                            </li>
+                            {% else %}
+                            <li><i class="opacity-50">Nenhuma subcategoria</i></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 </div>
+                {% endfor %}
             </div>
-        </div>
-    </div>
-
-    <h4 class="mt-5 mb-4 fw-bold" style="color: #5F7254;">Suas Categorias</h4>
-    <div class="row g-3">
-        {% for cat in categorias %}
-        <div class="col-md-4">
-            <div class="card card-custom bg-white p-3 border-top border-5" style="border-color: {{ cat.cor }} !important;">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h5 class="fw-bold m-0"><i class="bi {{ cat.icone }} me-2" style="color: {{ cat.cor }};"></i>{{ cat.nome }}</h5>
-                    <a href="{{ url_for('excluir_categoria', id=cat.id) }}" class="text-danger" onclick="return confirm('Excluir esta categoria apagará todas as subcategorias dela. Confirmar?')"><i class="bi bi-trash-fill"></i></a>
-                </div>
-                <ul class="list-unstyled ms-4 mt-2 mb-0 small text-muted fw-bold">
-                    {% for sub in cat.subcategorias %}
-                    <li class="d-flex justify-content-between align-items-center mb-1">
-                        <span><i class="bi bi-arrow-return-right me-1"></i> {{ sub.nome }}</span>
-                        <div>
-                            <button type="button" class="btn btn-sm text-primary p-0 me-2" onclick="editarSubcategoria({{ sub.id }}, '{{ sub.nome }}')" title="Editar Subcategoria"><i class="bi bi-pencil-fill"></i></button>
-                            <a href="{{ url_for('excluir_subcategoria', id=sub.id) }}" class="text-danger p-0" onclick="return confirm('Excluir esta subcategoria?')" title="Excluir Subcategoria"><i class="bi bi-trash-fill"></i></a>
-                        </div>
-                    </li>
-                    {% else %}
-                    <li><i class="opacity-50">Nenhuma subcategoria</i></li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
-        {% endfor %}
+        </main>
     </div>
 </div>
 
@@ -125,19 +166,11 @@
 <script>
     function editarSubcategoria(id, nomeAtual) {
         Swal.fire({
-            title: 'Editar Subcategoria',
-            input: 'text',
-            inputValue: nomeAtual,
-            showCancelButton: true,
-            confirmButtonText: 'Salvar',
-            cancelButtonText: 'Cancelar',
-            confirmButtonColor: '#5F7254'
+            title: 'Editar Subcategoria', input: 'text', inputValue: nomeAtual, showCancelButton: true, confirmButtonText: 'Salvar', cancelButtonText: 'Cancelar', confirmButtonColor: '#5F7254'
         }).then((result) => {
             if (result.isConfirmed && result.value) {
-                const form = document.getElementById('formEditSub');
-                form.action = '/editar_subcategoria/' + id;
-                document.getElementById('inputNovoNomeSub').value = result.value;
-                form.submit();
+                const form = document.getElementById('formEditSub'); form.action = '/editar_subcategoria/' + id;
+                document.getElementById('inputNovoNomeSub').value = result.value; form.submit();
             }
         });
     }

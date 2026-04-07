@@ -53,20 +53,26 @@ class Subcategoria(db.Model):
     categoria_id = db.Column(db.Integer, db.ForeignKey('categoria.id'), nullable=False)
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
 
+# O Motor de Inteligência precisa saber se é crédito e quais as datas
 class FormaPagamento(db.Model):
     __tablename__ = 'forma_pagamento'
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(50), nullable=False)
     icone = db.Column(db.String(255), nullable=False) 
     cor = db.Column(db.String(20), nullable=False, default='#6c757d')
+    is_credito = db.Column(db.Boolean, default=False)
+    dia_fechamento = db.Column(db.Integer, nullable=True)
+    dia_vencimento = db.Column(db.Integer, nullable=True)
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
 
+# Separamos a Data da Compra da Data de Cobrança (Caixa)
 class Movimentacao(db.Model):
     __tablename__ = 'movimentacao'
     id = db.Column(db.Integer, primary_key=True)
     descricao = db.Column(db.String(200), nullable=False)
     valor = db.Column(db.Float, nullable=False)
-    data = db.Column(db.Date, nullable=False)
+    data = db.Column(db.Date, nullable=False) # Data da Compra
+    data_cobranca = db.Column(db.Date, nullable=False) # Quando afeta o bolso
     tipo_gasto = db.Column(db.String(50))
     forma_pagto = db.Column(db.String(50))
     categoria = db.Column(db.String(50))

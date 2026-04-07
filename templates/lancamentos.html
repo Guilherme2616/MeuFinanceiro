@@ -2,87 +2,88 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Lançamentos - Meu Financeiro</title>
+    <title>Conta Corrente - Meu Financeiro</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
         :root { --cor-fundo: #FDFDE5; --cor-sidebar: #5F7254; --cor-botao: #783E19; --cor-botao-hover: #5c2e11; }
-        body { background-color: var(--cor-fundo); color: #333; font-family: 'Raleway', sans-serif; }
-        .sidebar { background-color: var(--cor-sidebar); color: white; min-height: 100vh; padding: 20px; }
+        body { background-color: var(--cor-fundo); color: #333; font-family: 'Raleway', sans-serif; position: relative; }
+        .sidebar { background-color: var(--cor-sidebar); color: white; min-height: 100vh; padding: 20px; z-index: 10; }
         .nav-link { color: rgba(255,255,255,0.8); font-weight: 600; }
         .nav-link:hover, .nav-link.active { color: white; background-color: rgba(255,255,255,0.1); border-radius: 8px; }
-        .card-custom { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .btn-salvar { background-color: var(--cor-botao); color: white; font-weight: 700; border: none; }
+        .card-custom { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative; z-index: 5; }
+        .btn-salvar { background-color: var(--cor-botao); color: white; font-weight: 700; border: none; position: relative; z-index: 5; }
         .btn-salvar:hover { background-color: var(--cor-botao-hover); color: white; }
-        .btn-logout { position: absolute; top: 20px; right: 20px; border-color: #dc3545; color: #dc3545; }
+        .btn-logout { position: absolute; top: 20px; right: 20px; border-color: #dc3545; color: #dc3545; z-index: 10; }
         .btn-logout:hover { background-color: #dc3545; color: white; }
+        .money-rain { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
+        .money-rain i { position: absolute; bottom: -100px; color: #D4AF37; opacity: 0.15; animation: floatUp linear infinite; font-size: 2.5rem; text-shadow: 0 0 15px rgba(212, 175, 55, 0.5); }
+        @keyframes floatUp { 0% { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0; } 10% { opacity: 0.25; } 90% { opacity: 0.25; } 100% { transform: translateY(-110vh) rotate(360deg) scale(1.2); opacity: 0; } }
     </style>
 </head>
 <body>
 
+<div class="money-rain">
+    <i class="bi bi-coin" style="left: 10%; animation-duration: 15s; animation-delay: 0s;"></i><i class="bi bi-currency-dollar" style="left: 25%; animation-duration: 12s; animation-delay: 2s; font-size: 3.5rem;"></i><i class="bi bi-gem" style="left: 40%; animation-duration: 18s; animation-delay: 5s; font-size: 2rem;"></i><i class="bi bi-coin" style="left: 60%; animation-duration: 14s; animation-delay: 1s;"></i><i class="bi bi-currency-dollar" style="left: 75%; animation-duration: 19s; animation-delay: 4s; font-size: 4rem;"></i><i class="bi bi-gem" style="left: 90%; animation-duration: 16s; animation-delay: 3s;"></i>
+</div>
+
 <div class="container-fluid">
     <div class="row">
-        <nav class="col-md-2 d-none d-md-block sidebar shadow-lg">
-            <h3 class="text-center mb-5 mt-3 fw-bold"><i class="bi bi-leaf me-2"></i>Meu Financeiro</h3>
+        <nav class="col-md-2 d-none d-md-block sidebar shadow-lg" style="position: sticky; top: 0; height: 100vh; overflow-y: auto; z-index: 10;">
+            
+            <div class="text-center mb-5 mt-4">
+                <i class="bi bi-bank" style="font-size: 3rem; color: #D4AF37; text-shadow: 0 4px 10px rgba(0,0,0,0.3);"></i>
+                <h3 class="fw-bold mt-2" style="color: #D4AF37; font-family: 'Playfair Display', serif; letter-spacing: 1px;">Meu Financeiro</h3>
+            </div>
+
             <ul class="nav flex-column gap-2">
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}"><i class="bi bi-pie-chart-fill me-2"></i> Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link active" href="{{ url_for('lancamentos') }}"><i class="bi bi-card-list me-2"></i> Lançamentos</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('investimentos') }}"><i class="bi bi-graph-up-arrow me-2"></i> Investimentos</a></li>
+                <li class="nav-item"><a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}"><i class="bi bi-pie-chart-fill me-2"></i> Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link {% if request.endpoint == 'lancamentos' %}active{% endif %}" href="{{ url_for('lancamentos') }}"><i class="bi bi-wallet2 me-2"></i> Conta Corrente</a></li>
+                <li class="nav-item"><a class="nav-link {% if request.endpoint == 'cartoes' %}active{% endif %}" href="{{ url_for('cartoes') }}"><i class="bi bi-credit-card me-2"></i> Cartões de Crédito</a></li>
+                <li class="nav-item"><a class="nav-link {% if request.endpoint == 'investimentos' %}active{% endif %}" href="{{ url_for('investimentos') }}"><i class="bi bi-graph-up-arrow me-2"></i> Investimentos</a></li>
                 
                 <li class="nav-item mt-2 border-top pt-2 border-secondary">
-                    <a class="nav-link" data-bs-toggle="collapse" href="#cadastrosMenu" role="button" aria-expanded="false">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#cadastrosMenu" role="button" aria-expanded="{% if request.endpoint in ['gerenciar_categorias', 'orcamentos', 'gerenciar_formas'] %}true{% else %}false{% endif %}">
                         <i class="bi bi-folder-fill me-2"></i> Cadastros <i class="bi bi-chevron-down float-end mt-1" style="font-size: 0.8rem;"></i>
                     </a>
-                    <div class="collapse" id="cadastrosMenu">
+                    <div class="collapse {% if request.endpoint in ['gerenciar_categorias', 'orcamentos', 'gerenciar_formas'] %}show{% endif %}" id="cadastrosMenu">
                         <ul class="nav flex-column ms-3 mt-1 gap-1">
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('gerenciar_categorias') }}" style="font-size: 0.9rem;"><i class="bi bi-tags-fill me-2"></i> Categorias</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('orcamentos') }}" style="font-size: 0.9rem;"><i class="bi bi-bullseye me-2"></i> Orçamentos</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('gerenciar_formas') }}" style="font-size: 0.9rem;"><i class="bi bi-credit-card-fill me-2"></i> Pagamentos</a></li>
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'gerenciar_categorias' %}active{% endif %}" href="{{ url_for('gerenciar_categorias') }}" style="font-size: 0.9rem;"><i class="bi bi-tags-fill me-2"></i> Categorias</a></li>
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'orcamentos' %}active{% endif %}" href="{{ url_for('orcamentos') }}" style="font-size: 0.9rem;"><i class="bi bi-bullseye me-2"></i> Orçamentos</a></li>
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'gerenciar_formas' %}active{% endif %}" href="{{ url_for('gerenciar_formas') }}" style="font-size: 0.9rem;"><i class="bi bi-credit-card-fill me-2"></i> Pagamentos</a></li>
                         </ul>
                     </div>
                 </li>
             </ul>
         </nav>
 
-        <main class="col-md-10 ms-sm-auto px-md-5 position-relative">
+        <main class="col-md-10 ms-sm-auto px-md-5 position-relative" style="z-index: 2;">
             <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-sm btn-logout fw-bold rounded-pill px-4">Sair</a>
-            <div class="pt-4 pb-2 mb-4 border-bottom border-dark-subtle mt-3"><h2 class="fw-bold">Gerenciar Lançamentos</h2></div>
+            <div class="pt-4 pb-2 mb-4 border-bottom border-dark-subtle mt-3"><h2 class="fw-bold">Lançamentos: Conta Corrente</h2></div>
 
             <div class="card card-custom p-3 mb-4 bg-white">
                 <form method="GET" action="{{ url_for('lancamentos') }}" class="row g-3 align-items-end" autocomplete="off" id="formFiltros">
+                    <div class="col-md-2"><label class="form-label small fw-bold text-muted">A partir de:</label><input type="date" name="data_inicio" class="form-control" value="{{ data_inicio }}"></div>
+                    <div class="col-md-2"><label class="form-label small fw-bold text-muted">Até:</label><input type="date" name="data_fim" class="form-control" value="{{ data_fim }}"></div>
                     <div class="col-md-2">
-                        <label class="form-label small fw-bold text-muted">A partir de:</label>
-                        <input type="date" name="data_inicio" class="form-control" value="{{ data_inicio }}">
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label small fw-bold text-muted">Até:</label>
-                        <input type="date" name="data_fim" class="form-control" value="{{ data_fim }}">
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label small fw-bold text-muted">Condição Pagto:</label>
+                        <label class="form-label small fw-bold text-muted">Conta (Filtro):</label>
                         <select name="filtro_pagto" class="form-select">
                             <option value="">Todas</option>
-                            {% for f in formas %}
-                                <option value="{{ f.nome }}" {% if filtro_pagto == f.nome %}selected{% endif %}>{{ f.nome }}</option>
-                            {% endfor %}
+                            {% for f in formas_todas %}<option value="{{ f.nome }}" {% if filtro_pagto == f.nome %}selected{% endif %}>{{ f.nome }}</option>{% endfor %}
                         </select>
                     </div>
                     <div class="col-md-2">
                         <label class="form-label small fw-bold text-muted">Categoria:</label>
                         <select name="filtro_cat" class="form-select" id="filtro_cat">
                             <option value="">Todas</option>
-                            {% for c in categorias %}
-                                <option value="{{ c.nome }}" {% if filtro_cat == c.nome %}selected{% endif %}>{{ c.nome }}</option>
-                            {% endfor %}
+                            {% for c in categorias %}<option value="{{ c.nome }}" {% if filtro_cat == c.nome %}selected{% endif %}>{{ c.nome }}</option>{% endfor %}
                         </select>
                     </div>
                     <div class="col-md-2">
                         <label class="form-label small fw-bold text-muted">Subcategoria:</label>
-                        <select name="filtro_subcat" class="form-select" id="filtro_subcat">
-                            <option value="">Todas</option>
-                            {% if filtro_subcat %}<option value="{{ filtro_subcat }}" selected>{{ filtro_subcat }}</option>{% endif %}
-                        </select>
+                        <select name="filtro_subcat" class="form-select" id="filtro_subcat"><option value="">Todas</option></select>
                     </div>
                     <div class="col-md-1"><button type="submit" class="btn btn-salvar w-100 shadow-sm" title="Filtrar"><i class="bi bi-funnel-fill"></i></button></div>
                     <div class="col-md-1"><a href="{{ url_for('lancamentos') }}" class="btn btn-outline-secondary w-100" title="Limpar"><i class="bi bi-eraser-fill"></i></a></div>
@@ -95,112 +96,90 @@
                 <div class="col-md-3"><div class="card card-custom p-3 bg-white border-start border-info border-5"><h6 class="text-info fw-bold small">INVESTIMENTO (TOTAL)</h6><h3 class="fw-bold text-dark mb-0">R$ {{ t_investimento|formato_moeda }}</h3></div></div>
                 <div class="col-md-3">
                     <div class="card card-custom p-3 text-white shadow" style="background-color: var(--cor-sidebar);">
-                        <h6 class="fw-bold opacity-75 small">SALDO GERAL DA CONTA</h6>
-                        <h3 class="fw-bold mb-0">R$ {{ caixa|formato_moeda }}</h3>
-                        <small class="fw-bold" style="font-size: 0.75rem; color: #e9f0e6;">Patrimônio Total: R$ {{ patrimonio_total|formato_moeda }}</small>
+                        <h6 class="fw-bold opacity-75 small">SALDO GERAL DA CONTA</h6><h3 class="fw-bold mb-0">R$ {{ caixa|formato_moeda }}</h3><small class="fw-bold" style="font-size: 0.75rem; color: #e9f0e6;">Patrimônio Total: R$ {{ patrimonio_total|formato_moeda }}</small>
                     </div>
                 </div>
             </div>
 
             <div class="card card-custom p-4 mb-4 bg-white border border-secondary border-opacity-25">
-                <h5 class="mb-3 fw-bold" style="color: var(--cor-sidebar);"><i class="bi bi-plus-circle me-2"></i>Novo Lançamento</h5>
+                <h5 class="mb-3 fw-bold" style="color: var(--cor-sidebar);"><i class="bi bi-plus-circle me-2"></i>Novo Lançamento à Vista (Pix/Dinheiro)</h5>
                 <form class="row g-3" method="POST" autocomplete="off">
                     <div class="col-md-2">
                         <label class="form-label small fw-bold text-muted">Operação</label>
                         <select name="tipo_movimentacao" class="form-select border-2">
-                            <option value="Saída">🔴 Saída</option>
-                            <option value="Entrada">🟢 Entrada</option>
-                            <option value="Investimento">🔵 Investimento</option>
+                            <option value="Saída">🔴 Saída</option><option value="Entrada">🟢 Entrada</option><option value="Investimento">🔵 Investimento</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
-                        <label class="form-label small fw-bold text-muted">Descrição</label>
-                        <input type="text" name="descricao" class="form-control" placeholder="Ex: Mercado..." required autocomplete="off">
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label small fw-bold text-muted">Valor Total (R$)</label>
-                        <input type="text" name="valor" class="form-control" placeholder="0,00" required autocomplete="off">
-                    </div>
-                    <div class="col-md-1">
-                        <label class="form-label small fw-bold text-muted">Parcelas</label>
-                        <input type="number" name="parcelas" class="form-control" value="1" min="1" required>
-                    </div>
+                    <div class="col-md-3"><label class="form-label small fw-bold text-muted">Descrição</label><input type="text" name="descricao" class="form-control" placeholder="Ex: Salário, Conta Luz..." required autocomplete="off"></div>
+                    <div class="col-md-2"><label class="form-label small fw-bold text-muted">Valor Total (R$)</label><input type="text" name="valor" class="form-control" placeholder="0,00" required autocomplete="off"></div>
+                    <div class="col-md-1"><label class="form-label small fw-bold text-muted">Parcelas</label><input type="number" name="parcelas" class="form-control" value="1" min="1" required></div>
                     <div class="col-md-2">
                         <label class="form-label small fw-bold text-muted">Categoria</label>
-                        <select name="categoria" class="form-select" id="form_cat">
+                        <select name="categoria" class="form-select" id="form_cat_add">
                             {% for c in categorias %}<option value="{{ c.nome }}">{{ c.nome }}</option>{% endfor %}
                         </select>
                     </div>
+                    <div class="col-md-2"><label class="form-label small fw-bold text-muted">Subcategoria</label><select name="subcategoria" class="form-select" id="form_subcat_add"><option value="">Nenhuma</option></select></div>
                     <div class="col-md-2">
-                        <label class="form-label small fw-bold text-muted">Subcategoria</label>
-                        <select name="subcategoria" class="form-select" id="form_subcat">
-                            <option value="">Nenhuma</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label small fw-bold text-muted">Pagamento</label>
+                        <label class="form-label small fw-bold text-muted">Conta</label>
                         <select name="forma_pagto" class="form-select">
                             {% for f in formas %}<option value="{{ f.nome }}">{{ f.nome }}</option>{% endfor %}
                         </select>
                     </div>
-                    <div class="col-md-2">
-                        <label class="form-label small fw-bold text-muted">Data</label>
-                        <input type="date" name="data" class="form-control" required>
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-salvar w-100 py-2 shadow-sm rounded-3">Lançar</button>
-                    </div>
+                    <div class="col-md-2"><label class="form-label small fw-bold text-muted">Data</label><input type="date" name="data" class="form-control" required></div>
+                    <div class="col-md-2 d-flex align-items-end"><button type="submit" class="btn btn-salvar w-100 py-2 shadow-sm rounded-3">Lançar</button></div>
                 </form>
             </div>
 
             <form action="{{ url_for('excluir_mov_massa') }}" method="POST" id="form-exclusao-massa">
                 <div class="table-responsive bg-white rounded-4 shadow-sm p-4 mb-5">
                     <div class="d-flex justify-content-between mb-3 align-items-end">
-                        <h5 class="fw-bold m-0" style="color: var(--cor-sidebar);">Movimentações</h5>
-                        <button type="button" id="btn-excluir-massa" class="btn btn-sm btn-danger fw-bold shadow-sm">
-                            <i class="bi bi-trash3-fill me-1"></i> Excluir Selecionados
-                        </button>
+                        <h5 class="fw-bold m-0" style="color: var(--cor-sidebar);">Extrato do Mês Selecionado</h5>
+                        <button type="button" id="btn-excluir-massa" class="btn btn-sm btn-danger fw-bold shadow-sm"><i class="bi bi-trash3-fill me-1"></i> Excluir Selecionados</button>
                     </div>
                     <table class="table table-borderless align-middle">
                         <thead class="border-bottom">
-                            <tr class="text-muted small">
-                                <th><input type="checkbox" id="selectAll" class="form-check-input border-secondary"></th>
-                                <th>DATA</th><th>DESCRIÇÃO</th><th>PAGAMENTO</th><th>CATEGORIA</th><th>VALOR</th><th class="text-center">AÇÕES</th>
-                            </tr>
+                            <tr class="text-muted small"><th><input type="checkbox" id="selectAll" class="form-check-input border-secondary"></th><th>DATA</th><th>DESCRIÇÃO</th><th>CONTA</th><th>CATEGORIA</th><th>VALOR</th><th class="text-center">AÇÕES</th></tr>
                         </thead>
                         <tbody>
                             {% for m in movimentacoes %}
-                            <tr class="border-bottom">
-                                <td><input type="checkbox" name="mov_ids" value="{{ m.id }}" class="form-check-input row-checkbox border-secondary"></td>
-                                <td class="small text-secondary fw-bold">{{ m.data.strftime('%d/%m/%Y') }}</td>
-                                <td class="fw-bold">{{ m.descricao }}</td>
-                                <td>
-                                    {% set forma_obj = formas | selectattr('nome', 'equalto', m.forma_pagto) | list %}
-                                    {% if forma_obj %}
-                                        <span class="badge border d-inline-flex align-items-center" style="background-color: {{ forma_obj[0].cor }} !important; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
-                                            <i class="bi {{ forma_obj[0].icone }} me-1"></i> {{ m.forma_pagto }}
-                                        </span>
-                                    {% else %}
-                                        <span class="badge bg-light text-dark border">{{ m.forma_pagto }}</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% set cat_obj = categorias | selectattr('nome', 'equalto', m.categoria) | list %}
-                                    {% if cat_obj %}
-                                        <i class="bi {{ cat_obj[0].icone }} me-1" style="color: {{ cat_obj[0].cor }};"></i>
-                                    {% endif %}
-                                    {{ m.categoria }} {% if m.subcategoria %}<small class="text-muted">/ {{ m.subcategoria }}</small>{% endif %}
-                                </td>
-                                <td class="fw-bold {% if m.tipo_movimentacao == 'Entrada' %}text-success{% elif m.tipo_movimentacao == 'Saída' %}text-danger{% else %}text-info{% endif %}">
-                                    R$ {{ m.valor|formato_moeda }}
-                                </td>
-                                <td class="text-center">
-                                    <a href="{{ url_for('editar_mov', id=m.id) }}" class="btn btn-sm btn-outline-primary border-0 rounded-circle me-1" title="Editar"><i class="bi bi-pencil-fill"></i></a>
-                                    <a href="{{ url_for('excluir_mov', id=m.id) }}" class="btn btn-sm btn-outline-danger border-0 rounded-circle btn-excluir-mov" title="Excluir individual"><i class="bi bi-trash3-fill"></i></a>
-                                </td>
-                            </tr>
+                                {% if m.is_fatura %}
+                                <tr class="border-bottom" style="background-color: #fff9e6;">
+                                    <td></td>
+                                    <td class="small text-secondary fw-bold">{{ m.data_cobranca.strftime('%d/%m/%Y') }}</td>
+                                    <td class="fw-bold text-dark">{{ m.descricao }}</td>
+                                    <td><span class="badge bg-warning text-dark border"><i class="bi bi-credit-card me-1"></i> {{ m.forma_pagto }}</span></td>
+                                    <td class="text-muted small"><i class="bi bi-info-circle me-1"></i>Fatura gerada na aba Cartões</td>
+                                    <td class="fw-bold text-danger">R$ {{ m.valor|formato_moeda }}</td>
+                                    <td class="text-center"><span class="badge bg-secondary">Automático</span></td>
+                                </tr>
+                                {% else %}
+                                <tr class="border-bottom">
+                                    <td><input type="checkbox" name="mov_ids" value="{{ m.id }}" class="form-check-input row-checkbox border-secondary"></td>
+                                    <td class="small text-secondary fw-bold">{{ m.data_cobranca.strftime('%d/%m/%Y') }}</td>
+                                    <td class="fw-bold">{{ m.descricao }}</td>
+                                    <td>
+                                        {% set forma_obj = formas_todas | selectattr('nome', 'equalto', m.forma_pagto) | list %}
+                                        {% if forma_obj %}
+                                            <span class="badge border d-inline-flex align-items-center" style="background-color: {{ forma_obj[0].cor }} !important; color: white;">
+                                                <i class="bi {{ forma_obj[0].icone }} me-1"></i> {{ m.forma_pagto }}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-light text-dark border">{{ m.forma_pagto }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ m.categoria }} {% if m.subcategoria %}<small class="text-muted">/ {{ m.subcategoria }}</small>{% endif %}</td>
+                                    <td class="fw-bold {% if m.tipo_movimentacao == 'Entrada' %}text-success{% elif m.tipo_movimentacao == 'Saída' %}text-danger{% else %}text-info{% endif %}">
+                                        R$ {{ m.valor|formato_moeda }}
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="{{ url_for('editar_mov', id=m.id) }}" class="btn btn-sm btn-outline-primary border-0 rounded-circle me-1" title="Editar"><i class="bi bi-pencil-fill"></i></a>
+                                        <a href="{{ url_for('excluir_mov', id=m.id) }}" class="btn btn-sm btn-outline-danger border-0 rounded-circle btn-excluir-mov"><i class="bi bi-trash3-fill"></i></a>
+                                    </td>
+                                </tr>
+                                {% endif %}
                             {% else %}
-                            <tr><td colspan="7" class="text-center text-muted py-4">Nenhuma movimentação encontrada para estes filtros.</td></tr>
+                            <tr><td colspan="7" class="text-center text-muted py-4">Nenhuma movimentação encontrada.</td></tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -214,81 +193,39 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    const subcategoriasMap = {
-        {% for cat in categorias %}
-        "{{ cat.nome }}": [
-            {% for sub in cat.subcategorias %}
-            "{{ sub.nome }}",
-            {% endfor %}
-        ],
-        {% endfor %}
-    };
-
-    const formCatSelect = document.getElementById('form_cat');
-    const formSubSelect = document.getElementById('form_subcat');
-
-    formCatSelect.addEventListener('change', function() {
-        const catNome = this.value;
-        formSubSelect.innerHTML = '<option value="">Nenhuma</option>';
-        if(subcategoriasMap[catNome] && subcategoriasMap[catNome].length > 0) {
-            subcategoriasMap[catNome].forEach(sub => {
-                formSubSelect.innerHTML += `<option value="${sub}">${sub}</option>`;
-            });
-        }
+    const subMap = { {% for cat in categorias %}"{{ cat.nome }}": [{% for sub in cat.subcategorias %}"{{ sub.nome }}",{% endfor %}],{% endfor %} };
+    
+    // JS pro filtro
+    const fCat = document.getElementById('filtro_cat'); const fSub = document.getElementById('filtro_subcat');
+    fCat.addEventListener('change', function() {
+        fSub.innerHTML = '<option value="">Todas</option>';
+        if(subMap[this.value]) { subMap[this.value].forEach(s => fSub.innerHTML += `<option value="${s}" ${s==="{{ filtro_subcat }}"?'selected':''}>${s}</option>`); }
     });
-    if(formCatSelect.value) { formCatSelect.dispatchEvent(new Event('change')); }
+    if(fCat.value) fCat.dispatchEvent(new Event('change'));
 
-    const filtroCatSelect = document.getElementById('filtro_cat');
-    const filtroSubSelect = document.getElementById('filtro_subcat');
-    const subAtual = "{{ filtro_subcat }}";
-
-    filtroCatSelect.addEventListener('change', function() {
-        const catNome = this.value;
-        filtroSubSelect.innerHTML = '<option value="">Todas</option>';
-        if(subcategoriasMap[catNome] && subcategoriasMap[catNome].length > 0) {
-            subcategoriasMap[catNome].forEach(sub => {
-                const selected = (sub === subAtual) ? 'selected' : '';
-                filtroSubSelect.innerHTML += `<option value="${sub}" ${selected}>${sub}</option>`;
-            });
-        }
+    // JS pro Add
+    const aCat = document.getElementById('form_cat_add'); const aSub = document.getElementById('form_subcat_add');
+    aCat.addEventListener('change', function() {
+        aSub.innerHTML = '<option value="">Nenhuma</option>';
+        if(subMap[this.value]) { subMap[this.value].forEach(s => aSub.innerHTML += `<option value="${s}">${s}</option>`); }
     });
-    if(filtroCatSelect.value) { filtroCatSelect.dispatchEvent(new Event('change')); }
+    if(aCat.value) aCat.dispatchEvent(new Event('change'));
 
-    document.getElementById('selectAll').addEventListener('change', function() {
-        const checkboxes = document.querySelectorAll('.row-checkbox');
-        checkboxes.forEach(cb => cb.checked = this.checked);
-    });
+    document.getElementById('selectAll').addEventListener('change', function() { document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = this.checked); });
 
-    document.querySelectorAll('.btn-excluir-mov').forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault(); 
-            const url = this.getAttribute('href');
-            Swal.fire({
-                title: 'Tem certeza?', text: "Você não poderá reverter essa ação!", icon: 'warning',
-                showCancelButton: true, confirmButtonColor: '#dc3545', cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Sim, excluir!', cancelButtonText: 'Cancelar'
-            }).then((result) => { if (result.isConfirmed) { window.location.href = url; } });
+    document.querySelectorAll('.btn-excluir-mov').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault(); const url = this.getAttribute('href');
+            Swal.fire({ title: 'Excluir?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc3545', confirmButtonText: 'Sim' }).then((r) => { if(r.isConfirmed) window.location.href = url; });
         });
     });
 
-    const btnExcluirMassa = document.getElementById('btn-excluir-massa');
-    if (btnExcluirMassa) {
-        btnExcluirMassa.addEventListener('click', function(e) {
+    const btnMassa = document.getElementById('btn-excluir-massa');
+    if (btnMassa) {
+        btnMassa.addEventListener('click', function(e) {
             e.preventDefault();
-            const checkboxes = document.querySelectorAll('input[name="mov_ids"]:checked');
-            if (checkboxes.length === 0) {
-                Swal.fire({ icon: 'info', title: 'Ops...', text: 'Selecione pelo menos um lançamento para excluir.', confirmButtonColor: '#5F7254' });
-                return;
-            }
-
-            Swal.fire({
-                title: 'Excluir em massa?',
-                text: `Você está prestes a excluir ${checkboxes.length} lançamento(s). Isso não pode ser desfeito!`,
-                icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d', confirmButtonText: 'Sim, excluir todos!', cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) { document.getElementById('form-exclusao-massa').submit(); }
-            });
+            if (document.querySelectorAll('input[name="mov_ids"]:checked').length === 0) { Swal.fire({ icon: 'info', title: 'Selecione algo!'}); return; }
+            Swal.fire({ title: 'Excluir selecionados?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc3545', confirmButtonText: 'Sim' }).then((r) => { if(r.isConfirmed) document.getElementById('form-exclusao-massa').submit(); });
         });
     }
 </script>
