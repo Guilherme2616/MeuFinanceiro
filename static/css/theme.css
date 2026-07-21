@@ -1,6 +1,11 @@
+/* ======================================================
+   MEU FINANCEIRO
+   Theme v2
+====================================================== */
+
 :root{
 
-    /* Cores */
+    /* ===== CORES ===== */
 
     --primary:#5F7254;
     --primary-dark:#46533F;
@@ -11,7 +16,7 @@
 
     --surface:#FFFFFF;
 
-    --text:#222;
+    --text:#222222;
 
     --text-light:#6B7280;
 
@@ -23,114 +28,338 @@
 
     --danger:#D9534F;
 
-    /* Layout */
+    /* ===== LAYOUT ===== */
 
     --radius:14px;
 
-    --shadow:
-        0 8px 24px rgba(0,0,0,.08);
+    --shadow:0 8px 24px rgba(0,0,0,.08);
 
+    --transition:.25s ease;
+
+}
+
+
+/* ======================================================
+   GERAL
+====================================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
 }
 
 body{
 
     background:var(--background);
 
+    color:var(--text);
+
     font-family:'Inter',sans-serif;
+
+    min-height:100vh;
+
+}
+
+a{
+
+    color:var(--primary);
+
+    text-decoration:none;
+
+    transition:var(--transition);
+
+}
+
+a:hover{
+
+    color:var(--primary-dark);
+
+}
+
+
+/* ======================================================
+   TITULOS
+====================================================== */
+
+.mf-title{
+
+    font-size:2rem;
+
+    font-weight:700;
 
     color:var(--text);
 
+    margin-bottom:8px;
+
 }
 
-/* ==========================
-   Cards
-========================== */
+.mf-subtitle{
 
-.mf-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: 24px;
-    transition: all .25s ease;
+    color:var(--text-light);
+
+    font-size:1rem;
+
+    margin-bottom:30px;
+
+    line-height:1.5;
+
 }
 
-.mf-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 28px rgba(0,0,0,.10);
-}
 
-.card-modern{
+/* ======================================================
+   CARDS
+====================================================== */
+
+.mf-card{
 
     background:var(--surface);
 
-    border:none;
+    border:1px solid var(--border);
 
     border-radius:var(--radius);
 
     box-shadow:var(--shadow);
 
+    padding:30px;
+
+    transition:var(--transition);
+
 }
 
-.btn-modern{
+.mf-card:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 14px 30px rgba(0,0,0,.10);
+
+}
+
+
+/* ======================================================
+   INPUTS
+====================================================== */
+
+.mf-input{
+
+    height:50px;
 
     border-radius:12px;
+
+    border:1px solid var(--border);
+
+    box-shadow:none;
+
+    transition:var(--transition);
+
+}
+
+.mf-input:focus{
+
+    border-color:var(--primary);
+
+    box-shadow:0 0 0 .20rem rgba(95,114,84,.15);
+
+}
+
+
+/* ======================================================
+   BOTÕES
+====================================================== */
+
+.mf-btn-primary{
+
+    width:100%;
+
+    height:50px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:var(--primary);
+
+    color:white;
+
+    font-weight:600;
+
+    transition:var(--transition);
+
+}
+
+.mf-btn-primary:hover{
+
+    background:var(--primary-dark);
+
+    color:white;
+
+    transform:translateY(-1px);
+
+}
+
+
+/* ======================================================
+   LABELS
+====================================================== */
+
+label{
+
+    font-weight:600;
+
+    margin-bottom:8px;
+
+}
+
+
+/* ======================================================
+   LOGIN
+====================================================== */
+
+.login-page{
+
+    min-height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:40px;
+
+}
+
+.login-box{
+
+    width:100%;
+
+    max-width:450px;
+
+}
+
+.login-logo{
+
+    width:90px;
+
+    height:90px;
+
+    margin:auto;
+
+    margin-bottom:24px;
+
+    border-radius:50%;
+
+    background:var(--primary);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    color:white;
+
+    box-shadow:var(--shadow);
+
+}
+
+.login-logo svg{
+
+    width:42px;
+
+    height:42px;
+
+}
+
+.login-page .mf-card{
+
+    margin-top:25px;
+
+}
+
+.login-page .input-group{
+
+    margin-top:6px;
+
+}
+
+.input-group-text{
+
+    background:white;
+
+    border:1px solid var(--border);
+
+    border-right:none;
+
+}
+
+.input-group-text svg{
+
+    width:18px;
+
+    height:18px;
+
+}
+
+.input-group .btn{
+
+    border:1px solid var(--border);
+
+    border-left:none;
+
+    background:white;
+
+}
+
+.input-group .btn:hover{
+
+    background:#f5f5f5;
+
+}
+
+.login-page .alert{
+
+    border-radius:12px;
+
+}
+
+.login-page p{
+
+    margin-top:24px;
+
+    color:var(--text-light);
+
+}
+
+.login-page a{
 
     font-weight:600;
 
 }
 
-.form-control{
 
-    border-radius:12px;
+/* ======================================================
+   RESPONSIVO
+====================================================== */
 
-}
+@media(max-width:768px){
 
-/* ==========================
-   Títulos
-========================== */
+    .login-page{
 
-.mf-title {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 4px;
-}
+        padding:20px;
 
-.mf-subtitle {
-    color: var(--text-light);
-    font-size: .95rem;
-    margin-bottom: 24px;
-}
+    }
 
-/* ==========================
-   Inputs
-========================== */
+    .mf-card{
 
-.mf-input {
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    height: 48px;
-}
+        padding:24px;
 
-.mf-input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 .2rem rgba(95,114,84,.15);
-}
+    }
 
-/* ==========================
-   Botão Principal
-========================== */
+    .mf-title{
 
-.mf-btn-primary {
-    background: var(--primary);
-    border: none;
-    border-radius: 12px;
-    height: 48px;
-    font-weight: 600;
-    transition: .2s;
-}
+        font-size:1.7rem;
 
-.mf-btn-primary:hover {
-    background: var(--primary-dark);
+    }
+
 }

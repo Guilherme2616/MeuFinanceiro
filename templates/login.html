@@ -6,53 +6,114 @@ Login - Meu Financeiro
 
 {% block conteudo %}
 
-<style>
-    body {
-        background-color: #f0f2f5;
-    }
+<div class="login-page">
 
-    .card-login {
-        max-width: 380px;
-        margin: 80px auto;
-        border-radius: 10px;
-    }
-</style>
+    <div class="login-box">
 
-<div class="container">
-    <div class="card card-login shadow p-4 bg-white">
-        <h3 class="text-center mb-4">Acessar Conta</h3>
+        <div class="login-logo">
+            <i data-lucide="wallet"></i>
+        </div>
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            {% for category, message in messages %}
-              <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
+        <h1 class="mf-title text-center">
+            Meu Financeiro
+        </h1>
 
-        <form method="POST">
-            <div class="mb-3">
-                <label class="form-label">CPF</label>
-                <input type="text" name="cpf" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Senha</label>
-                <input type="password" name="senha" class="form-control" required>
-            </div>
-
-            <button type="submit" class="btn btn-success w-100">
-                Entrar
-            </button>
-        </form>
-
-        <hr>
-
-        <p class="text-center">
-            Ainda não tem conta?
-            <a href="{{ url_for('cadastro') }}">Cadastre-se</a>
+        <p class="mf-subtitle text-center">
+            Sua vida financeira, organizada em um só lugar.
         </p>
+
+        <div class="mf-card">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+
+                <div class="mb-3">
+
+                    <label class="form-label">CPF</label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text">
+                            <i data-lucide="user"></i>
+                        </span>
+
+                        <input
+                            type="text"
+                            name="cpf"
+                            class="form-control mf-input"
+                            placeholder="000.000.000-00"
+                            required>
+
+                    </div>
+
+                </div>
+
+                <div class="mb-4">
+
+                    <label class="form-label">Senha</label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text">
+                            <i data-lucide="lock"></i>
+                        </span>
+
+                        <input
+                            id="senha"
+                            type="password"
+                            name="senha"
+                            class="form-control mf-input"
+                            placeholder="Digite sua senha"
+                            required>
+
+                        <button
+                            type="button"
+                            class="btn btn-light"
+                            onclick="mostrarSenha()">
+
+                            <i id="iconeSenha" data-lucide="eye"></i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <button
+                    type="submit"
+                    class="btn mf-btn-primary w-100">
+
+                    Entrar
+
+                </button>
+
+            </form>
+
+        </div>
+
+        <p class="text-center mt-4">
+
+            Ainda não possui conta?
+
+            <br>
+
+            <a href="{{ url_for('cadastro') }}">
+                Cadastre-se
+            </a>
+
+        </p>
+
     </div>
+
 </div>
 
 {% endblock %}
