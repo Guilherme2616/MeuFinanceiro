@@ -36,8 +36,9 @@
 
 <body>
 
-{% if request.endpoint not in ['login','cadastro'] %}
+{% set paginas_sem_sidebar = ['login', 'cadastro'] %}
 
+{% if request.endpoint and request.endpoint not in paginas_sem_sidebar %}
 <div class="mf-app">
 
     {% include "components/sidebar.html" %}
