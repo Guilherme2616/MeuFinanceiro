@@ -1,0 +1,69 @@
+:root{
+
+    /* Cores */
+
+    --primary:#5F7254;
+    --primary-dark:#46533F;
+
+    --secondary:#783E19;
+
+    --background:#F5F6F8;
+
+    --surface:#FFFFFF;
+
+    --text:#222;
+
+    --text-light:#6B7280;
+
+    --border:#E5E7EB;
+
+    --success:#198754;
+
+    --warning:#F4B740;
+
+    --danger:#D9534F;
+
+    /* Layout */
+
+    --radius:14px;
+
+    --shadow:
+        0 8px 24px rgba(0,0,0,.08);
+
+}
+
+body{
+
+    background:var(--background);
+
+    font-family:'Inter',sans-serif;
+
+    color:var(--text);
+
+}
+
+.card-modern{
+
+    background:var(--surface);
+
+    border:none;
+
+    border-radius:var(--radius);
+
+    box-shadow:var(--shadow);
+
+}
+
+.btn-modern{
+
+    border-radius:12px;
+
+    font-weight:600;
+
+}
+
+.form-control{
+
+    border-radius:12px;
+
+}
