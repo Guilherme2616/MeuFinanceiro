@@ -1,0 +1,102 @@
+<div class="mf-sidebar">
+
+    <div class="mf-sidebar-header">
+
+        <div class="mf-logo">
+            <i data-lucide="wallet"></i>
+        </div>
+
+        <div>
+            <h4>Meu Financeiro</h4>
+            <small>Controle Financeiro</small>
+        </div>
+
+    </div>
+
+    <nav class="mf-sidebar-menu">
+
+        <a href="{{ url_for('dashboard') }}"
+           class="mf-nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+            <i data-lucide="layout-dashboard"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <div class="mf-nav-group">
+
+            <p>Financeiro</p>
+
+            <a href="{{ url_for('lancamentos') }}"
+               class="mf-nav-item {% if request.endpoint == 'lancamentos' %}active{% endif %}">
+                <i data-lucide="receipt"></i>
+                <span>Lançamentos</span>
+            </a>
+
+            <a href="{{ url_for('cartoes') }}"
+               class="mf-nav-item {% if request.endpoint == 'cartoes' %}active{% endif %}">
+                <i data-lucide="credit-card"></i>
+                <span>Cartões</span>
+            </a>
+
+            <a href="{{ url_for('orcamentos') }}"
+               class="mf-nav-item {% if request.endpoint == 'orcamentos' %}active{% endif %}">
+                <i data-lucide="target"></i>
+                <span>Orçamentos</span>
+            </a>
+
+        </div>
+
+        <div class="mf-nav-group">
+
+            <p>Patrimônio</p>
+
+            <a href="{{ url_for('investimentos') }}"
+               class="mf-nav-item {% if request.endpoint == 'investimentos' %}active{% endif %}">
+                <i data-lucide="trending-up"></i>
+                <span>Investimentos</span>
+            </a>
+
+        </div>
+
+        <div class="mf-nav-group">
+
+            <p>Configurações</p>
+
+                <a href="{{ url_for('gerenciar_categorias') }}"
+                class="mf-nav-item {% if request.endpoint == 'gerenciar_categorias' %}active{% endif %}">
+                    <i data-lucide="tags"></i>
+                    <span>Categorias</span>
+                </a>
+
+                <a href="{{ url_for('gerenciar_formas') }}"
+                class="mf-nav-item {% if request.endpoint == 'gerenciar_formas' %}active{% endif %}">
+                    <i data-lucide="wallet-cards"></i>
+                    <span>Formas de Pagamento</span>
+                </a>
+
+        </div>
+
+    </nav>
+
+    <div class="mf-sidebar-footer">
+
+        <div class="mf-user">
+
+            <div class="mf-avatar">
+                G
+            </div>
+
+            <div>
+
+                <strong>Guilherme</strong>
+
+                <a href="{{ url_for('logout') }}">
+                    Sair
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
