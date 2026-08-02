@@ -9,23 +9,15 @@
 
     <title>{% block titulo %}Meu Financeiro{% endblock %}</title>
 
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-          rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
 
-    <link rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Theme -->
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
 
     {% block head %}{% endblock %}
 
@@ -33,7 +25,7 @@
 
 <body>
 
-{% set paginas_sem_sidebar = ['login', 'cadastro'] %}
+{% set paginas_sem_sidebar = ['login','cadastro'] %}
 {% set mostrar_sidebar = request.endpoint not in paginas_sem_sidebar %}
 
 {% if mostrar_sidebar %}
@@ -42,43 +34,51 @@
 
     {% include 'components/sidebar.html' %}
 
-    <main class="mf-content">
+    <div class="mf-main">
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} mb-3">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+        {% include 'components/topbar.html' %}
 
-{% endif %}
+        <section class="mf-page">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category,message in messages %}
+                        <div class="alert alert-{{category}}">
+                            {{message}}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block conteudo %}
+
+            {% endblock %}
+
+        </section>
+
+    </div>
+
+</div>
+
+{% else %}
 
 {% block conteudo %}
 
 {% endblock %}
 
-{% if mostrar_sidebar %}
-
-    </main>
-
-</div>
-
 {% endif %}
 
-<!-- Bootstrap -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Lucide -->
 <script src="https://unpkg.com/lucide@latest"></script>
 
 <script>
-    lucide.createIcons();
+lucide.createIcons();
 </script>
 
-{% block scripts %}{% endblock %}
+{% block scripts %}
+
+{% endblock %}
 
 </body>
 

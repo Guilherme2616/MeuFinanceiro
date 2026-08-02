@@ -1,0 +1,45 @@
+
+<header class="mf-topbar">
+
+    <div class="mf-topbar-left">
+
+        <button class="mf-menu-btn" id="menuToggle">
+            <i data-lucide="menu"></i>
+        </button>
+
+        <div>
+            <h2 id="pageTitle">{% block page_title %}Dashboard{% endblock %}</h2>
+            <small>Bem-vindo ao Meu Financeiro</small>
+        </div>
+
+    </div>
+
+    <div class="mf-topbar-right">
+
+        <button class="mf-icon-btn">
+            <i data-lucide="search"></i>
+        </button>
+
+        <button class="mf-icon-btn">
+            <i data-lucide="bell"></i>
+        </button>
+
+        <div class="mf-profile">
+
+            <div class="mf-avatar-small">
+                {{ current_user.nome_completo[0]|upper }}
+            </div>
+
+            <div>
+
+                <strong>{{ current_user.nome_completo.split(' ')[0] }}</strong>
+
+                <small>Minha Conta</small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</header>
