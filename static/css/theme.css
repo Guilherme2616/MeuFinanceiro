@@ -51,7 +51,8 @@
 
 body{
 
-    background:var(--background);
+    background: red;
+    /*var(--background);*/
 
     color:var(--text);
 
