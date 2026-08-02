@@ -6,40 +6,56 @@
             <i data-lucide="wallet"></i>
         </div>
 
-        <div>
+        <div class="mf-logo-text">
             <h4>Meu Financeiro</h4>
-            <small>Controle Financeiro</small>
+            <small>Seu patrimônio organizado</small>
         </div>
 
     </div>
 
-    <nav class="mf-sidebar-menu">
+    <hr class="mf-divider">
 
-        <a href="{{ url_for('dashboard') }}"
-           class="mf-nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
-            <i data-lucide="layout-dashboard"></i>
-            <span>Dashboard</span>
-        </a>
+    <nav class="mf-sidebar-menu">
 
         <div class="mf-nav-group">
 
-            <p>Financeiro</p>
+            <p>GERAL</p>
+
+            <a href="{{ url_for('dashboard') }}"
+               class="mf-nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                <div class="mf-nav-icon">
+                    <i data-lucide="layout-dashboard"></i>
+                </div>
+                <span>Dashboard</span>
+            </a>
+
+        </div>
+
+        <div class="mf-nav-group">
+
+            <p>FINANCEIRO</p>
 
             <a href="{{ url_for('lancamentos') }}"
                class="mf-nav-item {% if request.endpoint == 'lancamentos' %}active{% endif %}">
-                <i data-lucide="receipt"></i>
+                <div class="mf-nav-icon">
+                    <i data-lucide="receipt"></i>
+                </div>
                 <span>Lançamentos</span>
             </a>
 
             <a href="{{ url_for('cartoes') }}"
                class="mf-nav-item {% if request.endpoint == 'cartoes' %}active{% endif %}">
-                <i data-lucide="credit-card"></i>
+                <div class="mf-nav-icon">
+                    <i data-lucide="credit-card"></i>
+                </div>
                 <span>Cartões</span>
             </a>
 
             <a href="{{ url_for('orcamentos') }}"
                class="mf-nav-item {% if request.endpoint == 'orcamentos' %}active{% endif %}">
-                <i data-lucide="target"></i>
+                <div class="mf-nav-icon">
+                    <i data-lucide="target"></i>
+                </div>
                 <span>Orçamentos</span>
             </a>
 
@@ -47,11 +63,13 @@
 
         <div class="mf-nav-group">
 
-            <p>Patrimônio</p>
+            <p>PATRIMÔNIO</p>
 
             <a href="{{ url_for('investimentos') }}"
                class="mf-nav-item {% if request.endpoint == 'investimentos' %}active{% endif %}">
-                <i data-lucide="trending-up"></i>
+                <div class="mf-nav-icon">
+                    <i data-lucide="trending-up"></i>
+                </div>
                 <span>Investimentos</span>
             </a>
 
@@ -59,19 +77,23 @@
 
         <div class="mf-nav-group">
 
-            <p>Configurações</p>
+            <p>CONFIGURAÇÕES</p>
 
-                <a href="{{ url_for('gerenciar_categorias') }}"
-                class="mf-nav-item {% if request.endpoint == 'gerenciar_categorias' %}active{% endif %}">
+            <a href="{{ url_for('gerenciar_categorias') }}"
+               class="mf-nav-item {% if request.endpoint == 'gerenciar_categorias' %}active{% endif %}">
+                <div class="mf-nav-icon">
                     <i data-lucide="tags"></i>
-                    <span>Categorias</span>
-                </a>
+                </div>
+                <span>Categorias</span>
+            </a>
 
-                <a href="{{ url_for('gerenciar_formas') }}"
-                class="mf-nav-item {% if request.endpoint == 'gerenciar_formas' %}active{% endif %}">
+            <a href="{{ url_for('gerenciar_formas') }}"
+               class="mf-nav-item {% if request.endpoint == 'gerenciar_formas' %}active{% endif %}">
+                <div class="mf-nav-icon">
                     <i data-lucide="wallet-cards"></i>
-                    <span>Formas de Pagamento</span>
-                </a>
+                </div>
+                <span>Formas de Pagamento</span>
+            </a>
 
         </div>
 
@@ -82,15 +104,18 @@
         <div class="mf-user">
 
             <div class="mf-avatar">
-                G
+                {{ current_user.nome_completo[0]|upper }}
             </div>
 
-            <div>
+            <div class="mf-user-info">
 
-                <strong>Guilherme</strong>
+                <strong>{{ current_user.nome_completo.split(' ')[0] }}</strong>
+
+                <small>Usuário</small>
 
                 <a href="{{ url_for('logout') }}">
-                    Sair
+                    <i data-lucide="log-out"></i>
+                    Encerrar sessão
                 </a>
 
             </div>
