@@ -25,7 +25,7 @@
 
 <body>
 
-{% set paginas_sem_sidebar = ['login','cadastro'] %}
+{% set paginas_sem_sidebar = ['login', 'cadastro'] %}
 {% set mostrar_sidebar = request.endpoint not in paginas_sem_sidebar %}
 
 {% if mostrar_sidebar %}
@@ -42,29 +42,28 @@
 
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
-                    {% for category,message in messages %}
-                        <div class="alert alert-{{category}}">
-                            {{message}}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
                         </div>
                     {% endfor %}
                 {% endif %}
             {% endwith %}
 
-            {% block conteudo %}
+{% else %}
 
-            {% endblock %}
+{% endif %}
+
+{% block conteudo %}
+{% endblock %}
+
+{% if mostrar_sidebar %}
 
         </section>
 
     </div>
 
 </div>
-
-{% else %}
-
-{% block conteudo %}
-
-{% endblock %}
 
 {% endif %}
 
@@ -73,11 +72,10 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 
 <script>
-lucide.createIcons();
+    lucide.createIcons();
 </script>
 
 {% block scripts %}
-
 {% endblock %}
 
 </body>
